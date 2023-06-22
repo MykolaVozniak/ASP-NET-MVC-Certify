@@ -1,4 +1,4 @@
-namespace Sertify.Models
+namespace Certify.Models
 {
     public class ErrorViewModel
     {

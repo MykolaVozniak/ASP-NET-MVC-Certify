@@ -1,8 +1,8 @@
+using Certify.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Sertify.Data;
 
-namespace Sertify
+namespace Certify
 {
     public class Program
     {

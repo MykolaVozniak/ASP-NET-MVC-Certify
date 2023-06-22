@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Sertify.Models;
+﻿using Certify.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Sertify.Controllers
+namespace Certify.Controllers
 {
     public class HomeController : Controller
     {

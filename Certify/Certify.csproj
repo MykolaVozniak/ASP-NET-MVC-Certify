@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>aspnet-Sertify-a3d8b1fb-6a2c-4199-b85f-be839fc94ffb</UserSecretsId>
+    <UserSecretsId>aspnet-Certify-f4d3b6a7-db75-4984-b50f-6eda32f9bda2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
