@@ -1,9 +1,9 @@
-﻿@{
+﻿@model int
+@{
     ViewData["Title"] = "My Documents";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome to @ViewData["Title"]</h1>
-    <h1>@ViewData["Title"]</h1>
-    <p>List of your documents is here...</a>.</p>
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <p>List of your documents is here... @Model</p>
 </div>

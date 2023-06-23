@@ -6,7 +6,10 @@ namespace Practice_Project.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            int first = 1;
+            int second = 2;
+            int result = (first + second)*2;
+            return View(result);
         }
     }
 }
