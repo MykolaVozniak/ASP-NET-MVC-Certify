@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Data.Models;
+using Certify.Models;
 namespace Certify.Data
 {
-    public class CertifyDbContext : IdentityDbContext
+    public class CertifyDbContext : IdentityDbContext<User>
     {
         public CertifyDbContext(DbContextOptions<CertifyDbContext> options)
             : base(options)
