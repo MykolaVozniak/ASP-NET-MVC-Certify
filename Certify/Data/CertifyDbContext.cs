@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Data.Models;
+using Certify.Models;
 namespace Certify.Data
 {
     public class CertifyDbContext : IdentityDbContext
@@ -31,11 +31,6 @@ namespace Certify.Data
                 .WithMany(d => d.Signatures)
                 .HasForeignKey(s => s.DocumentId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-
-
-
-
         }
     }
 }

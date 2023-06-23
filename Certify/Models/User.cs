@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace Data.Models
+namespace Certify.Models
 {
     public class User : IdentityUser
     {

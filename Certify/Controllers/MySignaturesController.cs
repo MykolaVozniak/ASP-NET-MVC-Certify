@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Practice_Project.Controllers
+namespace Certify.Controllers
 {
     public class MySignaturesController : Controller
     {

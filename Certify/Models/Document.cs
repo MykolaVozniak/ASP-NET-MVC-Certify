@@ -1,8 +1,6 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations;
-
-namespace Data.Models
+namespace Certify.Models
 {
     public class Document
     {

@@ -1,6 +1,4 @@
-﻿
-
-namespace Data.Models
+﻿namespace Certify.Models
 {
     public class Signature
     {

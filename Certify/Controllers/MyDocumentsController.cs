@@ -1,15 +1,55 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
+using Certify.Models;
+using Certify.Data;
 
-namespace Practice_Project.Controllers
+namespace Certify.Controllers
 {
     public class MyDocumentsController : Controller
     {
-        public IActionResult Index()
+		private readonly CertifyDbContext context;
+
+		public MyDocumentsController(CertifyDbContext context)
+		{
+			this.context = context;
+		}
+
+		public IActionResult Index()
         {
-            int first = 1;
-            int second = 2;
-            int result = (first + second)*2;
-            return View(result);
+            return View();
         }
-    }
+		
+		[HttpGet]
+		public IActionResult Add()
+		{
+			UsersList();
+			return View();
+		}
+
+		private void UsersList()
+		{
+			var usersList = context.User.ToList();
+			ViewBag.OSList = new SelectList(usersList, nameof(Users), nameof(OperationSystem.Name));
+		}
+
+		// POST: /Laptops/Add
+		[HttpPost]
+		public IActionResult Create(Document document)
+		{
+			if (!ModelState.IsValid)
+			{
+				UsersList();
+				return View(document);
+			}
+
+			context.Laptops.Add(document);
+			context.SaveChanges();
+
+			TempData["alertMessage"] = "Product was successfully created!";
+
+			return RedirectToAction(nameof(Index));
+		}
+	}
 }
