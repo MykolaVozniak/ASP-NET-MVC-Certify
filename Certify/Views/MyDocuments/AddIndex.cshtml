@@ -1,0 +1,18 @@
+﻿@model IEnumerable<Certify.Models.Document>
+@{
+    ViewData["Title"] = "Додайте файл";
+}
+<h3>Виберіть файл для завантаження</h3>
+<form asp-action="AddIndex" asp-controller="MyDocumentsController" method="post" enctype="multipart/form-data">
+    <input type="file" name="uploadedFile"/>
+    <input type="submit"/>
+</form>
+
+<h1>Create New Laptop</h1>
+<hr />
+
+<h3>Всі файли</h3>
+@foreach (var f in Model)
+{
+    <p><img src="@Url.Content(f.FileURL)"></p>
+}

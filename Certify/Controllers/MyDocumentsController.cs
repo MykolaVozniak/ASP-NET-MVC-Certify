@@ -1,63 +1,57 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using Certify.Data;
 using Certify.Models;
-using Certify.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Certify.Controllers
 {
     public class MyDocumentsController : Controller
     {
-        private readonly CertifyDbContext _context;
+        CertifyDbContext _context;
+        IWebHostEnvironment _appEnvironment;
 
-        public MyDocumentsController(CertifyDbContext context)
+        public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment)
         {
             _context = context;
+            _appEnvironment = appEnvironment;
         }
 
-        // GET: /Document/Add
-        public IActionResult Add()
+        public IActionResult AddIndex()
         {
-            return View();
+            return View(_context.Documents.ToList());
         }
-
-        // POST: /Document/Add
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Add(Document document, IFormFile file)
+        public async Task<IActionResult> AddIndex(IFormFile uploadedFile)
         {
-            if (ModelState.IsValid)
+
+            string currentUserId = User.Identity.Name;
+
+            if (uploadedFile != null)
             {
-                // Отримання ідентифікатора поточного користувача (UserId)
-                string currentUserId = "1"; /* Отримати ідентифікатор поточного користувача */
-
-                // Заповнення додаткових полів документа
-                document.Title = "ERORD"; /* Отримати назву документа */
-                document.UploadedDate = DateTime.Now;
-                document.UserId = currentUserId;
-
-                // Збереження документа в базі даних
-                _context.Documents.Add(document);
-                _context.SaveChanges();
-
-                // Збереження файлу у папці в рішенні
-                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Documents", file.FileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // путь к папке Document
+                string path = "/Documents/" + uploadedFile.FileName;
+                // сохраняем файл в папку Document в каталоге wwwroot
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
                 {
-                    file.CopyTo(stream);
+                    await uploadedFile.CopyToAsync(fileStream);
                 }
-
-                // Збереження шляху до файлу в поле FileURL документа
-                document.FileURL = filePath;
-
-                // Оновлення запису документа в базі даних з відповідним шляхом до файлу
+                Document file = new Document {
+                    Id = 1,
+                    Title = uploadedFile.FileName,
+                    FileURL = path,
+                    UserId = currentUserId,
+                    UploadedDate = DateTime.Now,
+                    ShortDescription = "defefefef",
+                };
+                _context.Documents.Add(file);
                 _context.SaveChanges();
-
-                return RedirectToAction("Index", "Home"); // Перенаправлення на головну сторінку після успішного створення документу
             }
 
-            return View(document);
+            return RedirectToAction("AddIndex");
         }
     }
 }
