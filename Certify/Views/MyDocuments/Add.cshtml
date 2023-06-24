@@ -1,24 +1,35 @@
-﻿@model Certify.Models.Document;
+﻿@model Certify.Models.Document
 
-<h1>New Document</h1>
-<hr />
+<h2>Add Document</h2>
 
-<form asp-action="Create" method="post" class="row g-3">
-    <div class="col-6">
-        <label asp-for="ShortDescription" class="form-label">Your message to certifiers</label>
-        <input asp-for="ShortDescription" class="form-control" placeholder="This document is very important ...">
-        <span asp-validation-for="Title" class="text-danger"></span>
+@using (Html.BeginForm("Add", "Document", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Title)
+        @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Title)
     </div>
-    <div class="col-6">
-        <label asp-for="Signatures" class="form-label">Certifiers</label>
-        <input asp-for="Signatures" class="form-control" placeholder="Mr White">
-        <span asp-validation-for="Signatures" class="text-danger"></span>
+
+    <div class="form-group">
+        <label for="file">File</label>
+        <input type="file" name="file" id="file" class="form-control-file" />
     </div>
-    
-    <div class="col-6">
-        <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ShortDescription)
+        @Html.TextBoxFor(model => model.ShortDescription, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ShortDescription)
     </div>
-    <div class="col-6">
-        <button type="submit" class="btn btn-primary w-100">Create</button>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Signatures)
+        @Html.TextBoxFor(model => model.Signatures, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Signatures)
     </div>
-</form>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+}

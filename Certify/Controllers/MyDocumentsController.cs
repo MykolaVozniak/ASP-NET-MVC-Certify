@@ -9,47 +9,55 @@ namespace Certify.Controllers
 {
     public class MyDocumentsController : Controller
     {
-		private readonly CertifyDbContext context;
+        private readonly CertifyDbContext _context;
 
-		public MyDocumentsController(CertifyDbContext context)
-		{
-			this.context = context;
-		}
+        public MyDocumentsController(CertifyDbContext context)
+        {
+            _context = context;
+        }
 
-		public IActionResult Index()
+        // GET: /Document/Add
+        public IActionResult Add()
         {
             return View();
         }
-		
-		[HttpGet]
-		public IActionResult Add()
-		{
-			UsersList();
-			return View();
-		}
 
-		private void UsersList()
-		{
-			var usersList = context.User.ToList();
-			ViewBag.OSList = new SelectList(usersList, nameof(Users), nameof(OperationSystem.Name));
-		}
+        // POST: /Document/Add
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Add(Document document, IFormFile file)
+        {
+            if (ModelState.IsValid)
+            {
+                // Отримання ідентифікатора поточного користувача (UserId)
+                string currentUserId = "1"; /* Отримати ідентифікатор поточного користувача */
 
-		// POST: /Laptops/Add
-		[HttpPost]
-		public IActionResult Create(Document document)
-		{
-			if (!ModelState.IsValid)
-			{
-				UsersList();
-				return View(document);
-			}
+                // Заповнення додаткових полів документа
+                document.Title = "ERORD"; /* Отримати назву документа */
+                document.UploadedDate = DateTime.Now;
+                document.UserId = currentUserId;
 
-			context.Laptops.Add(document);
-			context.SaveChanges();
+                // Збереження документа в базі даних
+                _context.Documents.Add(document);
+                _context.SaveChanges();
 
-			TempData["alertMessage"] = "Product was successfully created!";
+                // Збереження файлу у папці в рішенні
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Documents", file.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
 
-			return RedirectToAction(nameof(Index));
-		}
-	}
+                // Збереження шляху до файлу в поле FileURL документа
+                document.FileURL = filePath;
+
+                // Оновлення запису документа в базі даних з відповідним шляхом до файлу
+                _context.SaveChanges();
+
+                return RedirectToAction("Index", "Home"); // Перенаправлення на головну сторінку після успішного створення документу
+            }
+
+            return View(document);
+        }
+    }
 }
