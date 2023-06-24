@@ -1,7 +1,10 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
 
+<<<<<<< HEAD
+=======
 using System.ComponentModel.DataAnnotations;
 
+>>>>>>> origin/Halushka
 namespace Certify.Models
 {
     public class Document

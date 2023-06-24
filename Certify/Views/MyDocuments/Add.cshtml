@@ -1,0 +1,24 @@
+﻿@model Certify.Models.Document;
+
+<h1>New Document</h1>
+<hr />
+
+<form asp-action="Create" method="post" class="row g-3">
+    <div class="col-6">
+        <label asp-for="ShortDescription" class="form-label">Your message to certifiers</label>
+        <input asp-for="ShortDescription" class="form-control" placeholder="This document is very important ...">
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="col-6">
+        <label asp-for="Signatures" class="form-label">Certifiers</label>
+        <input asp-for="Signatures" class="form-control" placeholder="Mr White">
+        <span asp-validation-for="Signatures" class="text-danger"></span>
+    </div>
+    
+    <div class="col-6">
+        <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+    </div>
+    <div class="col-6">
+        <button type="submit" class="btn btn-primary w-100">Create</button>
+    </div>
+</form>

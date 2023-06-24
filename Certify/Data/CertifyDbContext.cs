@@ -31,11 +31,6 @@ namespace Certify.Data
                 .WithMany(d => d.Signatures)
                 .HasForeignKey(s => s.DocumentId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-
-
-
-
         }
     }
 }
