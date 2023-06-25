@@ -11,7 +11,6 @@ namespace Certify.Data
         }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Signature> Signatures { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

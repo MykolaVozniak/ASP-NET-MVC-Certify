@@ -1,9 +1,25 @@
-﻿@model int
+﻿@using System.Security.Policy;
+@model IEnumerable<Certify.Models.Document>
 @{
     ViewData["Title"] = "My Documents";
 }
+<h3>Завантажені файли</h3>
+@foreach (var f in Model)
+{
+   <p>
+            <div class="card-footer text-muted">
+             @f.Title 
+            <a href = "@Url.Content(f.FileURL)"> 
+                <img src="https://w7.pngwing.com/pngs/160/158/png-transparent-arrow-dowload-down-file-basic-interface-icon-thumbnail.png" height="20">
+            </a>
+        </div>
+   </p>
 
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>List of your documents is here... @Model</p>
-</div>
+}
+<h4>Виберіть файл для завантаження</h4>
+<form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data">
+    <input type="file" name="uploadedFile" /><br>
+    <input type="submit" value="Загрузить" />
+</form>
+
+

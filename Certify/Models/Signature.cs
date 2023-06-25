@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-﻿namespace Certify.Models
-=======
-﻿
 
-namespace Certify.Models
->>>>>>> origin/Halushka
+﻿namespace Certify.Models
 {
     public class Signature
     {
