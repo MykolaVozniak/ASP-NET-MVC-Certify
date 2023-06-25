@@ -35,7 +35,7 @@ namespace Certify.Controllers
         {
             if (uploadedFile != null)
             {
-                string path = "/Document/" + uploadedFile.FileName;
+                string path = "/Documents/" + uploadedFile.FileName;
 
                 using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
                 {
