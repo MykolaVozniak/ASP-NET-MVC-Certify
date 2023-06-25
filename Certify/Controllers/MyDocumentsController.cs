@@ -2,6 +2,8 @@
 using Certify.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace Certify.Controllers
 {
@@ -18,16 +20,20 @@ namespace Certify.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Create()
+        public IActionResult Index()
         {
-
             var document = _context.Documents.ToList();
 
-            return View("Create", document);
+            return View("Index", document);
+        }
+
+        public IActionResult Create()
+        {
+            return View("Create");
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddFile(IFormFile uploadedFile)
+        public async Task<IActionResult> AddFile(IFormFile uploadedFile, Document document)
         {
             if (uploadedFile != null)
             {
@@ -39,24 +45,52 @@ namespace Certify.Controllers
                 {
                     await uploadedFile.CopyToAsync(fileStream);
                 }
-                Document file = new Document
-                {
-                    Title = uploadedFile.FileName,
-                    FileURL = path,
-                    UserId = userId,
-                    UploadedDate = DateTime.Now,
-                    ShortDescription = "defefefef",
-                };
-                _context.Documents.Add(file);
+
+                document.FileURL = path;
+                document.UserId = userId;
+                document.UploadedDate = DateTime.Now;
+                
+                _context.Documents.Add(document);
                 _context.SaveChanges();
             }
 
             return RedirectToAction("Create");
         }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
     }
-}
+
+
+    /*
+    [HttpGet] // by default
+    public IActionResult Create()
+    {
+        SetOperationSystems();
+
+        return View();
+    }
+
+    private void SetOperationSystems()
+    {
+        var osList = context.OperationSystems.ToList();
+        ViewBag.OSList = new SelectList(osList, nameof(OperationSystem.Id), nameof(OperationSystem.Name));
+    }
+
+    // POST: /Laptops/Create
+    [HttpPost]
+    public IActionResult Create(Laptop laptop)
+    {
+        if (!ModelState.IsValid)
+        {
+            SetOperationSystems();
+            return View(laptop);
+        }
+
+        context.Laptops.Add(laptop);
+        context.SaveChanges();
+
+        TempData["alertMessage"] = "Product was successfully created!";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+*/
+} 

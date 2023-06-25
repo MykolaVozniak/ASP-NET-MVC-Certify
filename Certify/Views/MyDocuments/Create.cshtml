@@ -1,30 +1,47 @@
-﻿@using System.Security.Policy;
-@using Certify.Data;
-@using Certify.Models;
-@using Microsoft.AspNetCore.Identity;
-@model IEnumerable<Certify.Models.Document>
-@inject UserManager<User> _userManager
-@{
-    ViewData["Title"] = "My Documents";
-}
-<h3>Завантажені файли</h3>
-@{
-    var currentUser = await _userManager.GetUserAsync(Context.User);
-}
-
-@foreach (var f in Model.Where(x => x.UserId == currentUser.Id))
-{
-    <p>
-        <div class="card-footer text-muted">
-            @f.Title
-            <a href="@Url.Content(f.FileURL)">
-                <img src="https://w7.pngwing.com/pngs/160/158/png-transparent-arrow-dowload-down-file-basic-interface-icon-thumbnail.png" height="20">
-            </a>
-        </div>
-    </p>
-}
-<h4>Виберіть файл для завантаження</h4>
+﻿@*<h4>Виберіть файл для завантаження</h4>
 <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data">
     <input type="file" name="uploadedFile" /><br>
     <input type="submit" value="Загрузить" />
+</form>
+
+
+
+*@
+
+@using System.Security.Policy;
+@using Certify.Data;
+@using Certify.Models;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> _userManager
+@model Certify.Models.Document
+
+@{
+    ViewData["Title"] = "My Documents";
+}
+
+<form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="row g-3">
+    <div class="col-12">
+        <label class="form-label">Upload File</label>
+        <input type="file" name="uploadedFile" class="form-control" />
+        <span class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="ShortDescription" class="form-label">Short Description</label>
+        <input asp-for="ShortDescription" class="form-control" placeholder="FILL THIS">
+        <span asp-validation-for="ShortDescription" class="text-danger"></span>
+    </div>
+
+    <div class="col-6">
+        <label asp-for="Title" class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" placeholder="FILL THIS">
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="col-6">
+        <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+    </div>
+    <div class="col-6">
+        <button type="submit" class="btn btn-primary w-100">Create</button>
+    </div>
 </form>
