@@ -1,9 +1,4 @@
-
 ﻿namespace Certify.Models
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Halushka
 {
     public class Signature
     {
