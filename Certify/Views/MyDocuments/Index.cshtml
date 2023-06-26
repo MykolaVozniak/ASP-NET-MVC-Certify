@@ -3,7 +3,7 @@
 @using Certify.Models;
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> _userManager
-@model IEnumerable<Certify.Models.Document>
+@model List<Certify.Models.Document>
 
 @{
     ViewData["Title"] = "My Documents";
@@ -18,29 +18,32 @@
 
     <div class="col-md-2">
         <div class="card">
-            <a class="nav-link text-primary" asp-controller="MyDocuments" asp-action="Create">
-                <div class="card-body">
+            <div class="card-body">
+                <a class="nav-link text-primary" asp-controller="MyDocuments" asp-action="Create">
                     <i class="bi bi-file-earmark-plus display-1"></i>
                     <p>Add File</p>
-                </div>
-            </a>
+                </a>
+            </div>
         </div>
     </div>
 
     @{
         var currentUser = await _userManager.GetUserAsync(Context.User);
-        foreach (var f in Model.Where(x => x.UserId == currentUser.Id))
+
+        @for (int i = Model.Count - 1; i >= 0; i--)
         {
-            <div class="col-md-2">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="bi bi-file-earmark-text display-1"></i>
-                        <p>@f.Title</p>
+            var f = Model[i];
+            if (f.UserId == currentUser.Id)
+            {
+                <div class="col-md-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <i class="bi bi-file-earmark-text display-1"></i>
+                            <p>@f.Title</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
+            }
         }
     }
 </div>
-

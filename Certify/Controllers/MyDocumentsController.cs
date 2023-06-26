@@ -22,9 +22,9 @@ namespace Certify.Controllers
 
         public IActionResult Index()
         {
-            var document = _context.Documents.ToList();
+            var documents = _context.Documents.ToList();
 
-            return View("Index", document);
+            return View("Index", documents);
         }
 
         public IActionResult Create()
@@ -57,40 +57,4 @@ namespace Certify.Controllers
             return RedirectToAction("Index");
         }
     }
-
-
-    /*
-    [HttpGet] // by default
-    public IActionResult Create()
-    {
-        SetOperationSystems();
-
-        return View();
-    }
-
-    private void SetOperationSystems()
-    {
-        var osList = context.OperationSystems.ToList();
-        ViewBag.OSList = new SelectList(osList, nameof(OperationSystem.Id), nameof(OperationSystem.Name));
-    }
-
-    // POST: /Laptops/Create
-    [HttpPost]
-    public IActionResult Create(Laptop laptop)
-    {
-        if (!ModelState.IsValid)
-        {
-            SetOperationSystems();
-            return View(laptop);
-        }
-
-        context.Laptops.Add(laptop);
-        context.SaveChanges();
-
-        TempData["alertMessage"] = "Product was successfully created!";
-
-        return RedirectToAction(nameof(Index));
-    }
-
-*/
 } 
