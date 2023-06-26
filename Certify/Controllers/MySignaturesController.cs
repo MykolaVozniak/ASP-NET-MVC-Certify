@@ -1,14 +1,34 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Certify.Data;
+using Certify.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Certify.Controllers
 {
     [Authorize]
     public class MySignaturesController : Controller
     {
-        public IActionResult Index()
+        CertifyDbContext _context;
+        IWebHostEnvironment _appEnvironment;
+        private readonly UserManager<User> _userManager;
+
+        public MySignaturesController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
         {
-            return View();
+            _context = context;
+            _appEnvironment = appEnvironment;
+            _userManager = userManager;
+        }
+        public async Task<IActionResult> IndexAsync()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string userId = user.Id;
+            var signature = _context.Signatures 
+                .Where(s => s.IsSigned == null)
+                .ToListAsync();
+
+            return View("Index", signature);
         }
     }
 }

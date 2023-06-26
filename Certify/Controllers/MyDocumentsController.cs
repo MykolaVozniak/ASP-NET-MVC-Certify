@@ -43,12 +43,12 @@ namespace Certify.Controllers
                 .Where(u => u.Id != userId)
                 .ToList();
 
-            ViewBag.UserList = new SelectList(userList, nameof(Models.User.Firstname), nameof(Models.User.Lastname), nameof(Models.User.Email));
+            ViewBag.UserList = new SelectList(userList, nameof(Models.User.Id), nameof(Models.User.Email));
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> AddFile(IFormFile uploadedFile, DocumentAndSignatureCombined document)
+        public async Task<IActionResult> AddFile(IFormFile uploadedFile, DocumentAndSignatureCombined dasc)
         {
             if (uploadedFile != null)
             {
@@ -61,11 +61,11 @@ namespace Certify.Controllers
                     await uploadedFile.CopyToAsync(fileStream);
                 }
 
-                document.DocumentFC.FileURL = path;
-                document.DocumentFC.UserId = userId;
-                document.DocumentFC.UploadedDate = DateTime.Now;
+                dasc.DocumentFC.FileURL = path;
+                dasc.DocumentFC.UserId = userId;
+                dasc.DocumentFC.UploadedDate = DateTime.Now;
 
-                _context.Documents.Add(document.DocumentFC);
+                _context.Documents.Add(dasc.DocumentFC);
                 _context.SaveChanges();
 
                 var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
@@ -74,7 +74,7 @@ namespace Certify.Controllers
                 {
                     IsSigned = null,
                     DocumentId = lastDocument.Id,
-                    UserId = "58907c80-5262-4245-9b5c-eb259f2b8e81"
+                    UserId = dasc.SignatureFC.UserId
                 };
 
                 _context.Signatures.Add(signature);
