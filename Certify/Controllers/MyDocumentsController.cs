@@ -11,8 +11,8 @@ namespace Certify.Controllers
     [Authorize]
     public class MyDocumentsController : Controller
     {
-        CertifyDbContext _context;
-        IWebHostEnvironment _appEnvironment;
+         readonly CertifyDbContext _context;
+         readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
 
         public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
@@ -29,13 +29,26 @@ namespace Certify.Controllers
             return View("Index", documents);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
+            await SelectUserAsync();
             return View("Create");
         }
+        private async Task SelectUserAsync()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string userId = user.Id;
+
+            var userList = _context.Users
+                .Where(u => u.Id != userId)
+                .ToList();
+
+            ViewBag.UserList = new SelectList(userList, nameof(Models.User.Firstname), nameof(Models.User.Lastname), nameof(Models.User.Email));
+        }
+
 
         [HttpPost]
-        public async Task<IActionResult> AddFile(IFormFile uploadedFile, Document document)
+        public async Task<IActionResult> AddFile(IFormFile uploadedFile, DocumentAndSignatureCombined document)
         {
             if (uploadedFile != null)
             {
@@ -48,11 +61,11 @@ namespace Certify.Controllers
                     await uploadedFile.CopyToAsync(fileStream);
                 }
 
-                document.FileURL = path;
-                document.UserId = userId;
-                document.UploadedDate = DateTime.Now;
+                document.DocumentFC.FileURL = path;
+                document.DocumentFC.UserId = userId;
+                document.DocumentFC.UploadedDate = DateTime.Now;
 
-                _context.Documents.Add(document);
+                _context.Documents.Add(document.DocumentFC);
                 _context.SaveChanges();
 
                 var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
