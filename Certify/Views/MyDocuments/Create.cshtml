@@ -1,47 +1,49 @@
-﻿@*<h4>Виберіть файл для завантаження</h4>
-<form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data">
-    <input type="file" name="uploadedFile" /><br>
-    <input type="submit" value="Загрузить" />
-</form>
-
-
-
-*@
-
-@using System.Security.Policy;
+﻿@using System.Security.Policy;
 @using Certify.Data;
 @using Certify.Models;
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> _userManager
 @model Certify.Models.Document
-
 @{
-    ViewData["Title"] = "My Documents";
+    ViewData["Title"] = "Add Document";
 }
 
-<form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="row g-3">
-    <div class="col-12">
-        <label class="form-label">Upload File</label>
-        <input type="file" name="uploadedFile" class="form-control" />
-        <span class="text-danger"></span>
+<div class="container col-md-6">
+
+    <div class="text-center text-uppercase">
+        <h1 class="display-4">@ViewData["Title"]</h1>
     </div>
 
-    <div class="col-12">
-        <label asp-for="ShortDescription" class="form-label">Short Description</label>
-        <input asp-for="ShortDescription" class="form-control" placeholder="FILL THIS">
-        <span asp-validation-for="ShortDescription" class="text-danger"></span>
-    </div>
+    <hr/>
 
-    <div class="col-6">
-        <label asp-for="Title" class="form-label">Title</label>
-        <input asp-for="Title" class="form-control" placeholder="FILL THIS">
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
+    <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3">
+        <div class="col-12">
+            <label class="form-label">Upload File</label>
+            <input type="file" name="uploadedFile" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
 
-    <div class="col-6">
-        <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
-    </div>
-    <div class="col-6">
-        <button type="submit" class="btn btn-primary w-100">Create</button>
-    </div>
-</form>
+        <div class="col-12">
+            <label asp-for="Title" class="form-label">Title</label>
+            <input asp-for="Title" class="form-control" placeholder="FILL THIS">
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class ="col-12">
+            <label asp-for="ShortDescription" class="form-label">Short Description</label>
+            <input asp-for="ShortDescription" class="form-control" placeholder="FILL THIS">
+            <span asp-validation-for="ShortDescription" class="text-danger"></span>
+        </div>
+
+
+        <div class="col-6">
+                <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+        </div>
+
+        <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Create</button>
+        </div>
+        
+    </form>
+
+</div>

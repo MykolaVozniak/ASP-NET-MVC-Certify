@@ -54,7 +54,7 @@ namespace Certify.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("Create");
+            return RedirectToAction("Index");
         }
     }
 

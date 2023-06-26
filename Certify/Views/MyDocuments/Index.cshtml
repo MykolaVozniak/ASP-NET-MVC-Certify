@@ -12,21 +12,35 @@
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
     <p>List of your documents is here...</p>
-    <a class="nav-link text-dark" asp-area="" asp-controller="MyDocuments" asp-action="Create">Add</a>
 </div>
 
-<h3>Завантажені файли</h3>
-@{
-    var currentUser = await _userManager.GetUserAsync(Context.User);
-    foreach (var f in Model.Where(x => x.UserId == currentUser.Id))
-    {
-        <p>
-            <div class="card-footer text-muted">
-                @f.Title
-                <a href="@Url.Content(f.FileURL)">
-                    <img src="https://w7.pngwing.com/pngs/160/158/png-transparent-arrow-dowload-down-file-basic-interface-icon-thumbnail.png" height="20">
-                </a>
+<div class="container row text-center">
+
+    <div class="col-md-2">
+        <div class="card">
+            <a class="nav-link text-primary" asp-controller="MyDocuments" asp-action="Create">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-plus display-1"></i>
+                    <p>Add File</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    @{
+        var currentUser = await _userManager.GetUserAsync(Context.User);
+        foreach (var f in Model.Where(x => x.UserId == currentUser.Id))
+        {
+            <div class="col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <i class="bi bi-file-earmark-text display-1"></i>
+                        <p>@f.Title</p>
+                    </div>
+                </div>
             </div>
-        </p>
+            
+        }
     }
-}
+</div>
+
