@@ -11,8 +11,8 @@ namespace Certify.Controllers
     [Authorize]
     public class MyDocumentsController : Controller
     {
-        CertifyDbContext _context;
-        IWebHostEnvironment _appEnvironment;
+        readonly CertifyDbContext _context;
+        readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
 
         public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
@@ -29,17 +29,23 @@ namespace Certify.Controllers
             return View("Index", documents);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            //SelectUser();
+            await SelectUserAsync();
             return View("Create");
         }
-
-        private void SelectUser()
+        private async Task SelectUserAsync()
         {
-            var userList = _context.Users.ToList();
-            ViewBag.UserList = new SelectList(userList, nameof(Models.User.Firstname), nameof(Models.User.Lastname), nameof(Models.User.Email));
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string userId = user.Id;
+
+            var userList = _context.Users
+                .Where(u => u.Id != userId)
+                .ToList();
+
+            ViewBag.UserList = new SelectList(userList, nameof(Models.User.Id), nameof(Models.User.Email));
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddFile(IFormFile uploadedFile, DocumentAndSignatureCombined dasc)
@@ -64,15 +70,15 @@ namespace Certify.Controllers
 
                 var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
 
-                /*var signature = new Signature
+                var signature = new Signature
                 {
                     IsSigned = null,
                     DocumentId = lastDocument.Id,
-                    UserId = "58907c80-5262-4245-9b5c-eb259f2b8e81"
+                    UserId = dasc.SignatureFC.UserId
                 };
 
                 _context.Signatures.Add(signature);
-                await _context.SaveChangesAsync();*/
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction("Index");
