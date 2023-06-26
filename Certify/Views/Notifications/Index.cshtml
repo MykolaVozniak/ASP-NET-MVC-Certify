@@ -1,8 +1,68 @@
-﻿@{
-    ViewData["Title"] = "Notifications";
+﻿@using System.Security.Policy;
+@using Certify.Data;
+@using Certify.Models;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> _userManager
+@model List<Certify.Models.Signature>
+@{
+    ViewData["Title"] = "Notification";
 }
+
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>Notifications here 1 2 3</p>
+    <h4 class="text-start"> There are <b>@Model.Count documents </b>  for signature</h4>
+
+    @{
+        <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Document</th>
+                <th scope="col">Description</th>
+                <th scope="col">From user</th>                
+                <th scope="col">Data</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+                @foreach (var signature in Model)
+                {
+                        <tr class="align-middle">
+                            <td>
+                                <div >
+                                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"  target="_blank">
+                                            <i class="bi bi-file-earmark-text display-1"></i>
+                                            <h5>@signature.Document.Title</h5>
+                                    </a>
+                                    
+                                </div>
+                            </td>
+                                    <td>@signature.Document.ShortDescription</td>
+                                    <td>
+                                    
+                                            @{
+                                                var user = await _userManager.FindByIdAsync(signature.Document.UserId.ToString());
+                                                var userName = user != null ? user.Firstname : "Unknown User";
+                                            }
+                                            @userName
+                                    </td>
+                                    <td>@signature.Document.UploadedDate</td>
+                            <td>
+                                <div class="btn-group">
+                                        <i class="fa-solid fa-info"></i>
+
+                                        <i class="fa-solid fa-pen-to-square"></i>
+
+                                        <i class="fa-regular fa-trash-can"></i>
+
+                                </div>
+                            </td>
+                        </tr>
+                }
+        </tbody>
+    </table>
+    }
 </div>
+
+

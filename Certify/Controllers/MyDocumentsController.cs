@@ -35,7 +35,7 @@ namespace Certify.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddFile(IFormFile uploadedFile, Document document)
+        public async Task<IActionResult> AddFile(IFormFile uploadedFile, DocumentAndSignatureCombined combinedData)
         {
             if (uploadedFile != null)
             {
@@ -48,12 +48,24 @@ namespace Certify.Controllers
                     await uploadedFile.CopyToAsync(fileStream);
                 }
 
-                document.FileURL = path;
-                document.UserId = userId;
-                document.UploadedDate = DateTime.Now;
-                
-                _context.Documents.Add(document);
+                combinedData.DocumentFC.FileURL = path;
+                combinedData.DocumentFC.UserId = userId;
+                combinedData.DocumentFC.UploadedDate = DateTime.Now;
+
+                _context.Documents.Add(combinedData.DocumentFC);
                 _context.SaveChanges();
+
+                var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
+
+                var signature = new Signature
+                {
+                    IsSigned = null,
+                    DocumentId = lastDocument.Id,
+                    UserId = "58907c80 - 5262 - 4245 - 9b5c - eb259f2b8e81"
+                };
+
+                _context.Signatures.Add(signature);
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction("Index");

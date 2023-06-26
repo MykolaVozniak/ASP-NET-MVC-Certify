@@ -3,7 +3,7 @@
 @using Certify.Models;
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> _userManager
-@model Certify.Models.Document
+@model Certify.Models.DocumentAndSignatureCombined
 @{
     ViewData["Title"] = "Add Document";
 }
@@ -24,15 +24,15 @@
         </div>
 
         <div class="col-12">
-            <label asp-for="Title" class="form-label">Title</label>
-            <input asp-for="Title" class="form-control" placeholder="FILL THIS">
-            <span asp-validation-for="Title" class="text-danger"></span>
+            <label asp-for="DocumentFC.Title" class="form-label">Title</label>
+            <input asp-for="DocumentFC.Title" class="form-control" placeholder="FILL THIS">
+            <span asp-validation-for="DocumentFC.Title" class="text-danger"></span>
         </div>
 
         <div class ="col-12">
-            <label asp-for="ShortDescription" class="form-label">Short Description</label>
-            <input asp-for="ShortDescription" class="form-control" placeholder="FILL THIS">
-            <span asp-validation-for="ShortDescription" class="text-danger"></span>
+            <label asp-for="DocumentFC.ShortDescription" class="form-label">Short Description</label>
+            <input asp-for="DocumentFC.ShortDescription" class="form-control" placeholder="FILL THIS">
+            <span asp-validation-for="DocumentFC.ShortDescription" class="text-danger"></span>
         </div>
 
 
