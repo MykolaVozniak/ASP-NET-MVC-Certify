@@ -1,5 +1,6 @@
 ﻿using Certify.Data;
 using Certify.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +8,7 @@ using System;
 
 namespace Certify.Controllers
 {
+    [Authorize]
     public class MyDocumentsController : Controller
     {
         CertifyDbContext _context;
