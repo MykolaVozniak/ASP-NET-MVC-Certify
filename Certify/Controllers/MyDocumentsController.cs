@@ -5,14 +5,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using Certify.ViewModels;
 
 namespace Certify.Controllers
 {
     [Authorize]
     public class MyDocumentsController : Controller
     {
-        readonly CertifyDbContext _context;
-        readonly IWebHostEnvironment _appEnvironment;
+         readonly CertifyDbContext _context;
+         readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
 
         public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
@@ -48,25 +49,29 @@ namespace Certify.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddFile(IFormFile uploadedFile, DocumentAndSignatureCombined dasc)
+        public async Task<IActionResult> AddFile(DocumentCreate dasc)
         {
-            if (uploadedFile != null)
+            if (dasc.UploadedFile != null)
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                string currentUserId = user.Id;
-                string path = "/Documents/" + uploadedFile.FileName;
+                string path = "/Documents/" + dasc.UploadedFile.FileName;
 
                 using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
                 {
-                    await uploadedFile.CopyToAsync(fileStream);
+                    await dasc.UploadedFile.CopyToAsync(fileStream);
                 }
 
-                dasc.DocumentFC.FileURL = path;
-                dasc.DocumentFC.UserId = currentUserId;
-                dasc.DocumentFC.UploadedDate = DateTime.Now;
-
-                _context.Documents.Add(dasc.DocumentFC);
+                var document = new Document
+                {
+                    Title = dasc.Title,
+                    ShortDescription = dasc.ShortDescription,
+                    FileURL = path,
+                    UserId = user.Id,
+                    UploadedDate = DateTime.Now
+                };
+                _context.Documents.Add(document);
                 _context.SaveChanges();
+
 
                 var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
 
@@ -74,7 +79,7 @@ namespace Certify.Controllers
                 {
                     IsSigned = null,
                     DocumentId = lastDocument.Id,
-                    UserId = dasc.SignatureFC.UserId
+                    UserId = dasc.UserId
                 };
 
                 _context.Signatures.Add(signature);
