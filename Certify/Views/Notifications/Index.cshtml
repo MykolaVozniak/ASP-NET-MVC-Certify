@@ -5,64 +5,53 @@
 @inject UserManager<User> _userManager
 @model List<Certify.Models.Signature>
 @{
-    ViewData["Title"] = "Notification";
+    ViewData["Title"] = "Notifications";
 }
-
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-    <h4 class="text-start"> There are <b>@Model.Count documents </b>  for signature</h4>
-
-    @{
-        <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Document</th>
-                <th scope="col">Description</th>
-                <th scope="col">From user</th>                
-                <th scope="col">Data</th>
-
-
-            </tr>
-        </thead>
-        <tbody>
-                @foreach (var signature in Model)
-                {
-                        <tr class="align-middle">
-                            <td>
-                                <div >
-                                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"  target="_blank">
-                                            <i class="bi bi-file-earmark-text display-1"></i>
-                                            <h5>@signature.Document.Title</h5>
-                                    </a>
-                                    
-                                </div>
-                            </td>
-                                    <td>@signature.Document.ShortDescription</td>
-                                    <td>
-                                    
-                                            @{
-                                                var user = await _userManager.FindByIdAsync(signature.Document.UserId.ToString());
-                                                var userName = user != null ? user.Firstname : "Unknown User";
-                                            }
-                                            @userName
-                                    </td>
-                                    <td>@signature.Document.UploadedDate</td>
-                            <td>
-                                <div class="btn-group">
-                                        <i class="fa-solid fa-info"></i>
-
-                                        <i class="fa-solid fa-pen-to-square"></i>
-
-                                        <i class="fa-regular fa-trash-can"></i>
-
-                                </div>
-                            </td>
-                        </tr>
-                }
-        </tbody>
-    </table>
-    }
 </div>
 
+<div class="container col-md-7">
+    <div class="row g-3">
+        @{
+            for (int i = Model.Count - 1; i >= 0; i--)
+            {
+                var signature = Model[i];
+                <div class="card bg-light">
+                    <div class="card-body">
 
+                        <div class="row">
+
+                            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
+                                    <i class="bi bi-box-seam display-1"></i>
+                                </a>
+                            </div>
+
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        @{
+                                            var user = await _userManager.FindByIdAsync(signature.Document.UserId.ToString());
+                                            string userName = user != null ? (user.Firstname + " " + user.Lastname) : "Unknown User";
+                                        }
+                                        <p class="fw-bold text-center">Incoming document signing request from @userName.</p>
+                                        <p class="mb-1 mt-1">Document: "@signature.Document.Title"</p>
+                                        <p class="mb-1 mt-1">Description: "@signature.Document.ShortDescription"</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-end text-muted mb-1 mt-1">
+                                        @signature.Document.UploadedDate
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -11,8 +11,8 @@ namespace Certify.Controllers
     [Authorize]
     public class MyDocumentsController : Controller
     {
-         readonly CertifyDbContext _context;
-         readonly IWebHostEnvironment _appEnvironment;
+        readonly CertifyDbContext _context;
+        readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
 
         public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
@@ -53,7 +53,7 @@ namespace Certify.Controllers
             if (uploadedFile != null)
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                string userId = user.Id;
+                string currentUserId = user.Id;
                 string path = "/Documents/" + uploadedFile.FileName;
 
                 using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
@@ -62,7 +62,7 @@ namespace Certify.Controllers
                 }
 
                 dasc.DocumentFC.FileURL = path;
-                dasc.DocumentFC.UserId = userId;
+                dasc.DocumentFC.UserId = currentUserId;
                 dasc.DocumentFC.UploadedDate = DateTime.Now;
 
                 _context.Documents.Add(dasc.DocumentFC);
@@ -84,4 +84,4 @@ namespace Certify.Controllers
             return RedirectToAction("Index");
         }
     }
-} 
+}

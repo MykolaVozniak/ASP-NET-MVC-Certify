@@ -14,7 +14,7 @@
     <p>List of your documents is here...</p>
 </div>
 
-<div class="container row text-center">
+<div class="container row text-center g-3">
 
     <div class="col-md-2">
         <div class="card">
@@ -30,13 +30,13 @@
     @{
         var currentUser = await _userManager.GetUserAsync(Context.User);
 
-        @for (int i = Model.Count - 1; i >= 0; i--)
+        for (int i = Model.Count - 1; i >= 0; i--)
         {
             var f = Model[i];
             if (f.UserId == currentUser.Id)
             {
                 <div class="col-md-2">
-                    <div class="card">
+                    <div class="card bg-light">
                         <div class="card-body">
                             <i class="bi bi-file-earmark-text display-1"></i>
                             <p>@f.Title</p>
