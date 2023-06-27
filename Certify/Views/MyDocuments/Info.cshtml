@@ -1,32 +1,46 @@
 ﻿@model Certify.ViewModels.DocumentInfo;
+@using Microsoft.AspNetCore.Http.Extensions;
+
 @{
-    string returnUrl = ViewBag.ReturnUrl; //ViewData["ReturnUrl"] as string;
-
     ViewData["Title"] = Model.DocumentDI.Title;
-
+    string returnUrl = ViewBag.ReturnUrl;
+    string currentUrl = ViewBag.CurrentUrl;
 }
+
 <div>
-    <a href="@returnUrl" class="btn btn-outline-dark">
-     Back
-    </a>
-    <h1 class="d-inline-block align-middle">Laptop Details</h1>
+    @{
+        if (returnUrl != "" && returnUrl != currentUrl && returnUrl != null)
+        {
+            <a href="@returnUrl" class="btn btn-outline-secondary ">
+            <i class="bi bi-caret-left"></i>
+            Back
+            </a>
+        }
+    }
 </div>
 <hr />
 
 <section class="text-center">
     <h2 class="mb-4">@Model.DocumentDI.Title</h2>
     <p>@Model.DocumentDI.ShortDescription</p>
-    <p class=" text-muted" >В очікувані: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedNull))</p>
-    <p class=" text-muted" >Підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedTrue))</p>
+    
     @{
+        if (ViewBag.SignedTrue.Count > 0)
+        {
+            <p class=" text-muted">Підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedTrue))</p>
+        }
         if (ViewBag.SignedFalse.Count > 0)
         {
-          <p class=" text-muted" >Не підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedFalse))</p>
-
+            <p class=" text-muted">Не підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedFalse))</p>
+        }
+        if (ViewBag.SignedNull.Count > 0)
+        {
+            <p class=" text-muted">В очікувані: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedNull))</p>
         }
 
-      }
+
+    }
 
 
-    
+
 </section>

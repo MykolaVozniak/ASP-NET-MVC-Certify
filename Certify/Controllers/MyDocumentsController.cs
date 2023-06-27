@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using Certify.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Certify.Controllers
 {
-    [Authorize]
     public class MyDocumentsController : Controller
     {
-         readonly CertifyDbContext _context;
-         readonly IWebHostEnvironment _appEnvironment;
+        readonly CertifyDbContext _context;
+        readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
 
         public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
@@ -24,6 +24,8 @@ namespace Certify.Controllers
             _userManager = userManager;
         }
 
+        //Index
+        [Authorize]
         public IActionResult Index()
         {
             var documents = _context.Documents.ToList();
@@ -31,11 +33,14 @@ namespace Certify.Controllers
             return View("Index", documents);
         }
 
+        //Create
+        [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
             await SelectUserAsync();
             return View("Create");
         }
+
         private async Task SelectUserAsync()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -53,7 +58,7 @@ namespace Certify.Controllers
             ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
         }
 
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddFile(DocumentCreate dasc)
         {
@@ -100,7 +105,6 @@ namespace Certify.Controllers
             return RedirectToAction("Index");
         }
 
-
         private void SelectUserSigned(DocumentInfo tm)
         {
             var signedUsers = _context.Signatures
@@ -124,18 +128,12 @@ namespace Certify.Controllers
                                              .ToList();
         }
 
+        //Info
         public IActionResult Info(int id)
         {
             DocumentInfo documentInfo = new();
             documentInfo.DocumentDI = _context.Documents.Find(id);
             SelectUserSigned(documentInfo);
-
-            //string List<string> signedFalse=
-
-            //string signedTrue =
-
-            //string signedNull =
-
 
             if (documentInfo.DocumentDI == null)
             {
@@ -144,14 +142,9 @@ namespace Certify.Controllers
             else
             {
                 ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+                ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
                 return View(documentInfo);
-
-
             }
-
-
-
         }
-
     }
 }
