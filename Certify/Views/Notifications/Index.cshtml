@@ -30,7 +30,7 @@
                                 </a>
                             </div>
 
-                            <div class="col">
+                            <div class="col-md-9">
                                 <div class="row">
                                     <div class="col">
                                         @{
@@ -38,12 +38,12 @@
                                             string userName = user != null ? (user.Firstname + " " + user.Lastname) : "Unknown User";
                                         }
                                         <p class="fw-bold text-center">Incoming document signing request from @userName.</p>
-                                        <p class="mb-1 mt-1">Document: "@signature.Document.Title"</p>
-                                        <p class="mb-1 mt-1">Description: "@signature.Document.ShortDescription"</p>
+                                        <p class="mt-md-1">Document: "@signature.Document.Title"</p>
+                                        <p class="mt-md-1">Description: "@signature.Document.ShortDescription"</p>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12 text-end text-muted mb-1 mt-1">
+                                    <div class="col-md-12 text-end text-muted mt-md-1">
                                         @signature.Document.UploadedDate
                                     </div>
                                 </div>

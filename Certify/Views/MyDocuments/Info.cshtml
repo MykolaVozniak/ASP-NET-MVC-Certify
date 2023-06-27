@@ -1,5 +1,18 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Certify.ViewModels.DocumentInfo;
 @{
+    string returnUrl = ViewBag.ReturnUrl; //ViewData["ReturnUrl"] as string;
 }
+<div>
+    <a href="@returnUrl" class="btn btn-outline-dark">
+     Back
+    </a>
+    <h1 class="d-inline-block align-middle">Laptop Details</h1>
+</div>
+<hr />
+
+<section class="text-center">
+    <h2 class="mb-4">@Model.DocumentDI.Title</h2>
+    <p class=" text-muted">by @Model.DocumentDI.UserId</p>
+
+    <p>@Model.DocumentDI.ShortDescription</p>
+</section>
