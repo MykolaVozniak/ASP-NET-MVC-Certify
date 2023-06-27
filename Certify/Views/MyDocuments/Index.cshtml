@@ -38,8 +38,10 @@
                 <div class="col-md-2">
                     <div class="card bg-light h-100">
                         <div class="card-body">
+                            <a class="nav-link text-secondary" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@f.Id">
                             <i class="bi bi-file-earmark-text display-1"></i>
-                            <p>@f.Title</p>
+                            <p >@f.Title</p>
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -88,5 +88,25 @@ namespace Certify.Controllers
 
             return RedirectToAction("Index");
         }
+
+
+        public IActionResult Info(int id)
+        {
+            DocumentInfo documentInfo = new();
+            documentInfo.DocumentDI = _context.Documents.Find(id);
+
+            if (documentInfo.DocumentDI == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+
+                return View(documentInfo);
+            }
+  
+        }
+
     }
 }
