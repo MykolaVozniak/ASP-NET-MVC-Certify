@@ -95,6 +95,12 @@ namespace Certify.Controllers
             DocumentInfo documentInfo = new();
             documentInfo.DocumentDI = _context.Documents.Find(id);
 
+            //string List<string> signedFalse=
+
+            //string signedTrue =
+
+            //string signedNull =
+
             if (documentInfo.DocumentDI == null)
             {
                 return NotFound();
