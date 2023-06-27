@@ -1,6 +1,7 @@
 ﻿@model Certify.ViewModels.DocumentInfo;
 @{
     string returnUrl = ViewBag.ReturnUrl; //ViewData["ReturnUrl"] as string;
+    ViewData["Title"] = Model.DocumentDI.Title;
 }
 <div>
     <a href="@returnUrl" class="btn btn-outline-dark">
