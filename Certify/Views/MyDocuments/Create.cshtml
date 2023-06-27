@@ -17,11 +17,10 @@
     <hr/>
 
     <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3">
-
         <div class="col-12">
-            <label asp-for="UploadedFile" class="form-label">Upload File</label>
-            <input asp-for="UploadedFile" class="form-control" placeholder="Your.file">
-            <span asp-validation-for="UploadedFile" class="text-danger"></span>
+            <label class="form-label">Upload File</label>
+            <input type="file" name="uploadedFile" class="form-control" />
+            <span class="text-danger"></span>
         </div>
 
         <div class="col-12">
@@ -38,7 +37,7 @@
 
         <div class="col-12">
             <label asp-for="UserId" class="form-label">People for signatures action</label>
-            <select asp-for="UserId" asp-items="@ViewBag.UserList" class="form-select"></select>
+            <select asp-for="UserId" asp-items="@ViewBag.UserList" multiple class="form-select" ></select>
             <span asp-validation-for="UserId" class="text-danger"></span>
         </div>
 

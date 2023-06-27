@@ -42,9 +42,14 @@ namespace Certify.Controllers
 
             var userList = _context.Users
                 .Where(u => u.Id != userId)
+                .Select(u => new
+                {
+                    Id = u.Id,
+                    DisplayName = $"{u.Firstname} {u.Lastname} ({u.Email}) "
+                })
                 .ToList();
 
-            ViewBag.UserList = new SelectList(userList, nameof(Models.User.Id), nameof(Models.User.Email));
+            ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
         }
 
 
@@ -74,16 +79,21 @@ namespace Certify.Controllers
 
 
                 var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
-
-                var signature = new Signature
+                
+                for(int i=0; i<dasc.UserId.Count; i++) 
                 {
-                    IsSigned = null,
-                    DocumentId = lastDocument.Id,
-                    UserId = dasc.UserId
-                };
+                    var signature = new Signature
+                    {
+                        IsSigned = null,
+                        DocumentId = lastDocument.Id,
+                        UserId = dasc.UserId[i]
+                    };
 
-                _context.Signatures.Add(signature);
-                await _context.SaveChangesAsync();
+                    _context.Signatures.Add(signature);
+                    await _context.SaveChangesAsync();
+                }
+
+
             }
 
             return RedirectToAction("Index");

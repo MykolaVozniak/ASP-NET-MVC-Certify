@@ -11,7 +11,6 @@ namespace Certify.ViewModels
 
         [StringLength(150, MinimumLength = 2)]
         public string? ShortDescription { get; set; }
-
-        public string UserId { get; set; }
+        public List<string> UserId { get; set; }
     }
 }
