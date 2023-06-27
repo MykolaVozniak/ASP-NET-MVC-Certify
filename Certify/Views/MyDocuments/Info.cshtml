@@ -1,6 +1,7 @@
 ﻿@model Certify.ViewModels.DocumentInfo;
 @{
     string returnUrl = ViewBag.ReturnUrl; //ViewData["ReturnUrl"] as string;
+    
 }
 <div>
     <a href="@returnUrl" class="btn btn-outline-dark">
@@ -12,7 +13,18 @@
 
 <section class="text-center">
     <h2 class="mb-4">@Model.DocumentDI.Title</h2>
-    <p class=" text-muted">by @Model.DocumentDI.UserId</p>
-
     <p>@Model.DocumentDI.ShortDescription</p>
+    <p class=" text-muted" >В очікувані: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedNull))</p>
+    <p class=" text-muted" >Підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedTrue))</p>
+    @{
+        if (ViewBag.SignedFalse.Count > 0)
+        {
+          <p class=" text-muted" >Не підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedFalse))</p>
+
+        }
+
+      }
+
+
+    
 </section>

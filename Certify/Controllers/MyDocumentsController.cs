@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using Certify.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Certify.Controllers
 {
@@ -100,16 +101,41 @@ namespace Certify.Controllers
         }
 
 
+        private void SelectUserSigned(DocumentInfo tm)
+        {
+            var signedUsers = _context.Signatures
+                    .Include(s => s.User)
+                    .Where(s => s.DocumentId == tm.DocumentDI.Id)
+                    .Select(s => new
+                    {
+                        IsSigned = s.IsSigned,
+                        UserDescription = $"{s.User.Firstname} {s.User.Lastname} ({s.User.Email})"
+                    })
+                    .ToList();
+
+            ViewBag.SignedTrue = signedUsers.Where(s => s.IsSigned == true)
+                                            .Select(s => s.UserDescription)
+                                            .ToList();
+            ViewBag.SignedNull = signedUsers.Where(s => s.IsSigned == null)
+                                            .Select(s => s.UserDescription)
+                                            .ToList();
+            ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
+                                             .Select(s => s.UserDescription)
+                                             .ToList();
+        }
+
         public IActionResult Info(int id)
         {
             DocumentInfo documentInfo = new();
             documentInfo.DocumentDI = _context.Documents.Find(id);
+            SelectUserSigned(documentInfo);
 
             //string List<string> signedFalse=
 
             //string signedTrue =
 
             //string signedNull =
+
 
             if (documentInfo.DocumentDI == null)
             {
@@ -118,10 +144,13 @@ namespace Certify.Controllers
             else
             {
                 ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
-
                 return View(documentInfo);
+
+
             }
-  
+
+
+
         }
 
     }
