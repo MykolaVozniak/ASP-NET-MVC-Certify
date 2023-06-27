@@ -35,31 +35,11 @@
             <span asp-validation-for="DocumentFC.ShortDescription" class="text-danger"></span>
         </div>
 
-<<<<<<< HEAD
-        @*{
-            foreach (var os in Model.SignaturesFC)
-            {
-                <div class="col-6">
-                    <label asp-for="os" class="form-label">People for signatures action</label>
-                    <select asp-for="SignaturesFC.UserId" asp-items="@ViewBag.OSList" class="form-select"></select>
-                    <span asp-validation-for="SignaturesFC.UserId" class="text-danger"></span>
-                </div>         
-            }
-        }
-
-        
-        <div class="col-6">
-            <label asp-for="SignatureFC.UserId" class="form-label">People for signatures action</label>
-            <select asp-for="SignatureFC.UserId" asp-items="@ViewBag.UserList" class="form-select"></select>
-            <span asp-validation-for="SignatureFC.UserId" class="text-danger"></span>
-        </div>*@
-=======
         <div class="col-12">
             <label asp-for="SignatureFC.UserId" class="form-label">People for signatures action</label>
             <select asp-for="SignatureFC.UserId" asp-items="@ViewBag.UserList" class="form-select"></select>
             <span asp-validation-for="SignatureFC.UserId" class="text-danger"></span>
         </div>
->>>>>>> origin/dev2
 
         <div class="col-6">
                 <a asp-action="Index" class="btn btn-secondary w-100">Back</a>

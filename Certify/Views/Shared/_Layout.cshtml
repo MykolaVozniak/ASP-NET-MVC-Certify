@@ -2,7 +2,6 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +26,6 @@
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
                         {
-<<<<<<< HEAD
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="MySignatures" asp-action="Index">My Signatures</a>
                             </li>
@@ -46,26 +44,6 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                             </li>
-=======
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="MySignatures" asp-action="Index">My Signatures</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="MyDocuments" asp-action="Index">My Documents</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Notifications" asp-action="Index">Notifications</a>
-                                </li>
-                        }
-                        else
-                        {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                                </li>
->>>>>>> origin/dev2
                         }
                     </ul>
                     <partial name="_LoginPartial" />
