@@ -17,7 +17,7 @@
 <div class="container row text-center g-3">
 
     <div class="col-md-2">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-body">
                 <a class="nav-link text-primary" asp-controller="MyDocuments" asp-action="Create">
                     <i class="bi bi-file-earmark-plus display-1"></i>
@@ -36,7 +36,7 @@
             if (f.UserId == currentUser.Id)
             {
                 <div class="col-md-2">
-                    <div class="card bg-light">
+                    <div class="card bg-light h-100">
                         <div class="card-body">
                             <i class="bi bi-file-earmark-text display-1"></i>
                             <p>@f.Title</p>
