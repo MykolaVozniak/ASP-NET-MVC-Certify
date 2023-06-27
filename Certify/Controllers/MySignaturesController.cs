@@ -24,9 +24,9 @@ namespace Certify.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             string userId = user.Id;
-            var signature = _context.Signatures 
-                .Where(s => s.IsSigned == null)
-                .ToListAsync();
+            var signature = _context.Signatures
+            .Where(s => s.UserId == userId && s.IsSigned == null)
+            .ToListAsync();
 
             return View("Index", signature);
         }
