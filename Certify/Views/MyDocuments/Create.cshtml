@@ -9,46 +9,140 @@
 }
 
 <div class="container col-md-6">
-
     <div class="text-center text-uppercase">
         <h1 class="display-4">@ViewData["Title"]</h1>
     </div>
-
     <hr/>
-
-    <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3">
+    <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3" onsubmit="checkBadgeCount(event)">
         <div class="col-12">
             <label class="form-label">Upload File</label>
-            <input type="file" name="uploadedFile" class="form-control" />
+            <input type="file" name="uploadedFile" class="form-control"  />
             <span class="text-danger"></span>
         </div>
-
         <div class="col-12">
             <label asp-for="Title" class="form-label">Title</label>
-            <input asp-for="Title" class="form-control" placeholder="Document title...">
+            <input asp-for="Title" class="form-control" placeholder="Document title..." >
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
-
         <div class ="col-12">
             <label asp-for="ShortDescription" class="form-label">Short Description</label>
             <input asp-for="ShortDescription" class="form-control" placeholder="This document is very important because...">
             <span asp-validation-for="ShortDescription" class="text-danger"></span>
         </div>
-
         <div class="col-12">
-            <label asp-for="UserId" class="form-label">People for signatures action</label>
-            <select asp-for="UserId" asp-items="@ViewBag.UserList" multiple class="form-select" data-role="tagsinput"></select>
-            <span asp-validation-for="UserId" class="text-danger"></span>
+            <label class="form-label">User Email</label>
+            <input id="email-input" class="form-control" placeholder="Enter user emails..." />
+            <div id="badges-container" class="mt-2"></div>
+            <div id="error-message-not-found" class="text-danger"></div>
+            <div id="error-message-empty" class="text-danger"></div>
+            <input type="hidden" id="UserEmail" name="UserEmail" value=""  />
         </div>
-
         <div class="col-6">
-                <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+            <a asp-action="Index" class="btn btn-secondary w-100  mt-md-4">Back</a>
         </div>
-
         <div class="col-6">
-                <button type="submit" class="btn btn-primary w-100">Create</button>
+            <button type="submit" class="btn btn-primary w-100 mt-md-4">Create</button>
         </div>
-
     </form>
-
 </div>
+
+<script>
+    var badgesContainer = document.getElementById('badges-container');
+    var emailInput = document.getElementById('email-input');
+    var errorMessageNotFound = document.getElementById('error-message-not-found');
+    var errorMessageEmpty = document.getElementById('error-message-empty');
+
+    // Створюємо порожній список для збереження вибраних електронних адрес
+    var selectedEmails = [];
+
+    // Функція для створення нового badge
+    function createBadge(email) {
+        // Створюємо елемент badge
+        var badgeElement = document.createElement('span');
+        badgeElement.classList.add('badge', 'bg-primary', 'me-1');
+        badgeElement.textContent = email;
+
+        // Додаємо обробник події для видалення badge при кліку
+        badgeElement.addEventListener('click', function () {
+            removeBadge(email);
+        });
+
+        // Додаємо badge до контейнера
+        badgesContainer.appendChild(badgeElement);
+
+        // Додаємо електронну адресу до списку вибраних
+        selectedEmails.push(email);
+        updateUserEmails();
+        checkBadgeCount();
+    }
+
+    // Функція для видалення badge
+    function removeBadge(email) {
+        // Знаходимо елемент badge за електронною адресою
+        var badgeElements = badgesContainer.getElementsByClassName('badge');
+        for (var i = 0; i < badgeElements.length; i++) {
+            if (badgeElements[i].textContent === email) {
+                // Видаляємо елемент badge з DOM
+                badgeElements[i].parentNode.removeChild(badgeElements[i]);
+                break;
+            }
+        }
+
+        // Видаляємо електронну адресу зі списку вибраних
+        var index = selectedEmails.indexOf(email);
+        if (index > -1) {
+            selectedEmails.splice(index, 1);
+            updateUserEmails();
+            checkBadgeCount();
+        }
+    }
+
+    function updateUserEmails() {
+        // Оновлюємо значення властивості UserEmail зі значеннями змінної selectedEmails
+        var userEmailInput = document.getElementById('UserEmail');
+        userEmailInput.value = JSON.stringify(selectedEmails);
+    }
+
+    // Перевірка на кількість badges
+    function checkBadgeCount(event) {
+        if (selectedEmails.length === 0) {
+            errorMessageEmpty.textContent = 'Введіть хоча б один електронний адрес';
+            errorMessageEmpty.style.display = 'block';
+            errorMessageNotFound.textContent = '';
+            errorMessageNotFound.style.display = 'none';
+            event.preventDefault(); // Зупинити відправку форми, якщо відсутні електронні адреси
+        } else {
+            errorMessageEmpty.textContent = '';
+            errorMessageEmpty.style.display = 'none';
+        }
+    }
+
+    // Обробник події для додавання badge при натисканні клавіші Enter у полі вводу
+    emailInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            var email = emailInput.value.trim();
+
+            if (email !== '' && !selectedEmails.includes(email)) {
+                // Отримайте відповідні Id користувачів за електронною поштою і додайте до списку selectedEmails
+                fetch('/MyDocuments/CheckEmailExists?email=' + email)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            createBadge(email);
+                            errorMessageNotFound.textContent = '';
+                            errorMessageNotFound.style.display = 'none';
+                            checkBadgeCount();
+                        } else {
+                            errorMessageNotFound.textContent = 'Користувача з введеною електронною поштою не знайдено';
+                            errorMessageNotFound.style.display = 'block';
+                            errorMessageEmpty.textContent = '';
+                            errorMessageEmpty.style.display = 'none';
+                        }
+                    });
+            }
+
+            emailInput.value = '';
+        }
+    });
+</script>
