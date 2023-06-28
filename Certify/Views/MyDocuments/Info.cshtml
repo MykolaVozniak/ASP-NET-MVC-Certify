@@ -1,32 +1,93 @@
 ﻿@model Certify.ViewModels.DocumentInfo;
+@using Microsoft.AspNetCore.Http.Extensions;
+
 @{
-    string returnUrl = ViewBag.ReturnUrl; //ViewData["ReturnUrl"] as string;
-
     ViewData["Title"] = Model.DocumentDI.Title;
-
+    string returnUrl = ViewBag.ReturnUrl;
+    string currentUrl = ViewBag.CurrentUrl;
 }
-<div>
-    <a href="@returnUrl" class="btn btn-outline-dark">
-     Back
-    </a>
-    <h1 class="d-inline-block align-middle">Laptop Details</h1>
-</div>
-<hr />
 
-<section class="text-center">
-    <h2 class="mb-4">@Model.DocumentDI.Title</h2>
-    <p>@Model.DocumentDI.ShortDescription</p>
-    <p class=" text-muted" >В очікувані: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedNull))</p>
-    <p class=" text-muted" >Підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedTrue))</p>
+<div class="pb-3">
     @{
-        if (ViewBag.SignedFalse.Count > 0)
+        if (returnUrl != "" && returnUrl != currentUrl && returnUrl != null)
         {
-          <p class=" text-muted" >Не підписано: @Html.Raw(string.Join("<br>", (List<string>)ViewBag.SignedFalse))</p>
-
+            <a href="@returnUrl" class="btn btn-outline-secondary ">
+                <i class="bi bi-caret-left"></i>
+                Back
+            </a>
         }
+    }
+</div>
 
-      }
+<div class="container col-md-10">
+    <div class="card bg-light">
+        <div class="card-body">
 
+            <div class="row align-items-center flex-nowrap">
 
-    
-</section>
+                <div class="col-md-3 col-sm-3 col-lg-3 col display-1 d-flex justify-content-end">
+                    @{
+                        if (ViewBag.SignedFalse.Count == 0 && ViewBag.SignedNull.Count == 0)
+                        {
+                            <i class="bi bi-file-earmark-check text-success"></i>
+                        }
+                        else if (ViewBag.SignedTrue.Count == 0 && ViewBag.SignedNull.Count == 0)
+                        {
+                            <i class="bi bi-file-earmark-x text-danger"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-file-earmark-minus text-warning"></i>
+                        }
+                    }
+                </div>
+
+                <div class="col-md-7 col-sm-7 col-lg-7 display-6 text-break">
+                    <p class="mb-1 mt-1">
+                        @Model.DocumentDI.Title
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="container col-md-11">
+                <hr />
+                <p class="pt-3">
+                    "@Model.DocumentDI.ShortDescription"
+                </p>
+                <div class=" pt-3">
+                    @{
+                        if (ViewBag.SignedTrue.Count > 0)
+                        {
+                            <p class="">Signed by</p>
+                            foreach (var i in ViewBag.SignedTrue)
+                            {
+                                <span class="badge bg-success bg-opacity-75 text-white">@i.ToString()</span>
+                                <br>
+                            }
+                        }
+                        if (ViewBag.SignedFalse.Count > 0)
+                        {
+                            <p class="">Not signed by</p>
+                            foreach (var i in ViewBag.SignedFalse)
+                            {
+                                <span class="badge bg-danger bg-opacity-75 text-white">@i.ToString()</span>
+                                <br>
+                            }
+                        }
+                        if (ViewBag.SignedNull.Count > 0)
+                        {
+                            <p class="mb-0">Under consideration by</p>
+                            foreach (var i in ViewBag.SignedNull)
+                            {
+                                <span class="badge bg-warning bg-opacity-75 text-black">@i.ToString()</span>
+                                <br>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

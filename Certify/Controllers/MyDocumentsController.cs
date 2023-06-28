@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Certify.Controllers
 {
-    [Authorize]
     public class MyDocumentsController : Controller
     {
         private readonly CertifyDbContext _context;
@@ -24,12 +24,16 @@ namespace Certify.Controllers
             _userManager = userManager;
         }
 
+        //Index
+        [Authorize]
         public IActionResult Index()
         {
             var documents = _context.Documents.ToList();
             return View("Index", documents);
         }
 
+        //Create
+        [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
             await SelectUserAsync();
@@ -53,6 +57,8 @@ namespace Certify.Controllers
             ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
         }
 
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddFile(DocumentCreate dasc)
         {
@@ -120,6 +126,9 @@ namespace Certify.Controllers
             return user.Id;
         }
         [HttpGet]
+
+
+        //Info
         public IActionResult Info(int id)
         {
             DocumentInfo documentInfo = new();
@@ -133,10 +142,10 @@ namespace Certify.Controllers
             else
             {
                 ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+                ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
                 return View(documentInfo);
             }
         }
-
 
         //Method exist User Signature
         private void SelectUserSigned(DocumentInfo tm)
@@ -160,8 +169,10 @@ namespace Certify.Controllers
             ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
                                              .Select(s => s.UserDescription)
                                              .ToList();
+
+            //isIUserSignaturer - тру -> поточний юзер = в табличці з підписами цей документ і налл
+            //фолс - шо лібо з цього не вірно
+            //isMyDocument - 1 якшо це мій док
         }
-
-
     }
 }

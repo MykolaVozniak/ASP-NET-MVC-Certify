@@ -11,7 +11,7 @@ namespace Certify.ViewModels
         [Required(ErrorMessage = ("Dawn blat"))]
         public string Title { get; set; }
 
-        [StringLength(150, MinimumLength = 2)]
+        [StringLength(250, MinimumLength = 2)]
         public string? ShortDescription { get; set; }
         [Required(ErrorMessage =("Dawn blat"))]
         public string UserEmail { get; set; }
