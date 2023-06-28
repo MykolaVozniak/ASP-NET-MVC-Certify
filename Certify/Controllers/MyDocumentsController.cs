@@ -1,20 +1,20 @@
 ﻿using Certify.Data;
 using Certify.Models;
+using Certify.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using Certify.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Certify.Controllers
 {
     [Authorize]
     public class MyDocumentsController : Controller
     {
-         readonly CertifyDbContext _context;
-         readonly IWebHostEnvironment _appEnvironment;
+        private readonly CertifyDbContext _context;
+        private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
 
         public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
@@ -27,7 +27,6 @@ namespace Certify.Controllers
         public IActionResult Index()
         {
             var documents = _context.Documents.ToList();
-
             return View("Index", documents);
         }
 
@@ -36,6 +35,7 @@ namespace Certify.Controllers
             await SelectUserAsync();
             return View("Create");
         }
+
         private async Task SelectUserAsync()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -46,61 +46,99 @@ namespace Certify.Controllers
                 .Select(u => new
                 {
                     Id = u.Id,
-                    DisplayName = $"{u.Firstname} {u.Lastname} ({u.Email}) "
+                    DisplayName = $"{u.Firstname} {u.Lastname} ({u.Email})"
                 })
                 .ToList();
 
             ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
         }
 
-
         [HttpPost]
         public async Task<IActionResult> AddFile(DocumentCreate dasc)
         {
-            if (dasc.UploadedFile != null)
+
+            if (!ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                string path = "/Documents/" + dasc.UploadedFile.FileName;
+                await SelectUserAsync();
+                return View("Create", dasc);
+            }
 
-                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
-                {
-                    await dasc.UploadedFile.CopyToAsync(fileStream);
-                }
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string path = "/Documents/" + dasc.UploadedFile.FileName;
 
-                var document = new Document
-                {
-                    Title = dasc.Title,
-                    ShortDescription = dasc.ShortDescription,
-                    FileURL = path,
-                    UserId = user.Id,
-                    UploadedDate = DateTime.Now
-                };
-                _context.Documents.Add(document);
-                _context.SaveChanges();
+            using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+            {
+                await dasc.UploadedFile.CopyToAsync(fileStream);
+            }
 
+            var document = new Document
+            {
+                Title = dasc.Title,
+                ShortDescription = dasc.ShortDescription,
+                FileURL = path,
+                UserId = user.Id,
+                UploadedDate = DateTime.Now
+            };
+            _context.Documents.Add(document);
+            await _context.SaveChangesAsync();
 
-                var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
-                
-                for(int i=0; i<dasc.UserId.Count; i++) 
+            var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
+            var signatures = new List<Signature>();
+            var selectedEmails = JsonConvert.DeserializeObject<List<string>>(dasc.UserEmail);
+            foreach (var userEmail in selectedEmails)
+            {
+                string userId = GetUserIdByEmail(userEmail);
+                if (userId != null)
                 {
                     var signature = new Signature
                     {
                         IsSigned = null,
                         DocumentId = lastDocument.Id,
-                        UserId = dasc.UserId[i]
+                        UserId = userId
                     };
 
-                    _context.Signatures.Add(signature);
-                    await _context.SaveChangesAsync();
+                    signatures.Add(signature);
                 }
-
-
             }
+            _context.Signatures.AddRange(signatures);
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
+
+        }
+
+        [HttpGet]
+        public IActionResult CheckEmailExists(string email)
+        {
+            bool exists = _context.Users.Any(u => u.Email == email);
+            return Json(new { exists });
+        }
+        private string GetUserIdByEmail(string email)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            return user.Id;
+        }
+        [HttpGet]
+        public IActionResult Info(int id)
+        {
+            DocumentInfo documentInfo = new();
+            documentInfo.DocumentDI = _context.Documents.Find(id);
+            SelectUserSigned(documentInfo);
+
+            if (documentInfo.DocumentDI == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+                return View(documentInfo);
+            }
         }
 
 
+        //Method exist User Signature
         private void SelectUserSigned(DocumentInfo tm)
         {
             var signedUsers = _context.Signatures
@@ -124,34 +162,6 @@ namespace Certify.Controllers
                                              .ToList();
         }
 
-        public IActionResult Info(int id)
-        {
-            DocumentInfo documentInfo = new();
-            documentInfo.DocumentDI = _context.Documents.Find(id);
-            SelectUserSigned(documentInfo);
-
-            //string List<string> signedFalse=
-
-            //string signedTrue =
-
-            //string signedNull =
-
-
-            if (documentInfo.DocumentDI == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
-                return View(documentInfo);
-
-
-            }
-
-
-
-        }
 
     }
 }
