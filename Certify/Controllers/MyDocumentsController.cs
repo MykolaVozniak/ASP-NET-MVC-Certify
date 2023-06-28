@@ -105,6 +105,25 @@ namespace Certify.Controllers
             return RedirectToAction("Index");
         }
 
+        //Info
+        public IActionResult Info(int id)
+        {
+            DocumentInfo documentInfo = new();
+            documentInfo.DocumentDI = _context.Documents.Find(id);
+            SelectUserSigned(documentInfo);
+
+            if (documentInfo.DocumentDI == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+                ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
+                return View(documentInfo);
+            }
+        }
+
         private void SelectUserSigned(DocumentInfo tm)
         {
             var signedUsers = _context.Signatures
@@ -126,25 +145,10 @@ namespace Certify.Controllers
             ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
                                              .Select(s => s.UserDescription)
                                              .ToList();
-        }
 
-        //Info
-        public IActionResult Info(int id)
-        {
-            DocumentInfo documentInfo = new();
-            documentInfo.DocumentDI = _context.Documents.Find(id);
-            SelectUserSigned(documentInfo);
-
-            if (documentInfo.DocumentDI == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
-                ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
-                return View(documentInfo);
-            }
+            //isIUserSignaturer - тру -> поточний юзер = в табличці з підписами цей документ і налл
+            //фолс - шо лібо з цього не вірно
+            //isMyDocument - 1 якшо це мій док
         }
     }
 }

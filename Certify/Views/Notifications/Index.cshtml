@@ -10,7 +10,7 @@
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>List of your notification is here</p>
+    <p>List of your notification is here...</p>
 </div>
 
 <div class="container col-md-7">
@@ -19,36 +19,35 @@
             for (int i = Model.Count - 1; i >= 0; i--)
             {
                 var signature = Model[i];
-                <div class="card bg-light">
+                <div class="card bg-info bg-opacity-25">
                     <div class="card-body">
+                        <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@signature.Document.Id">
+                            <div class="row">
 
-                        <div class="row">
-
-                            <div class="col-md-3 d-flex justify-content-center align-items-center">
-                                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
+                                <div class="col-md-3 d-flex justify-content-center align-items-center">
                                     <i class="bi bi-box-seam display-1"></i>
-                                </a>
-                            </div>
+                                </div>
 
-                            <div class="col-md-9">
-                                <div class="row">
-                                    <div class="col">
-                                        @{
-                                            var user = await _userManager.FindByIdAsync(signature.Document.UserId.ToString());
-                                            string userName = user != null ? (user.Firstname + " " + user.Lastname) : "Unknown User";
-                                        }
-                                        <p class="fw-bold text-center">Incoming document signing request from @userName.</p>
-                                        <p class="mt-md-1">Document: "@signature.Document.Title"</p>
-                                        <p class="mt-md-1">Description: "@signature.Document.ShortDescription"</p>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col">
+                                            @{
+                                                var user = await _userManager.FindByIdAsync(signature.Document.UserId.ToString());
+                                                string userName = user != null ? (user.Firstname + " " + user.Lastname) : "Unknown User";
+                                            }
+                                            <p class="fw-bold text-center">Incoming document signing request from @userName.</p>
+                                            <p class="mt-md-1 text-truncate">Document: "@signature.Document.Title"</p>
+                                            <p class="mt-md-1 text-truncate">Description: "@signature.Document.ShortDescription"</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 text-end text-muted mt-md-1">
-                                        @signature.Document.UploadedDate
+                                    <div class="row">
+                                        <div class="col-md-12 text-end text-muted mt-md-1">
+                                            @signature.Document.UploadedDate
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
             }
