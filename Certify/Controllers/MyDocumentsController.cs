@@ -27,37 +27,32 @@ namespace Certify.Controllers
             _mapper = mapper;
         }
 
-        //Index
+        //----------------------------------------------Index----------------------------------------------
         [Authorize]
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            var documents = _context.Documents.ToList();
-            return View("Index", documents);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            var documents = _context.Documents.Where(d => d.UserId == user.Id).ToList();
+            List<DocumentIndex> documentList = _mapper.Map<List<Document>, List<DocumentIndex>>(documents);
+
+            foreach (var document in documentList)
+            {
+                int countTrue = _context.Signatures.Count(s => s.DocumentId == document.Id && s.IsSigned == true);
+                int countMax = _context.Signatures.Count(s => s.DocumentId == document.Id);
+
+                document.CountTrue = countTrue;
+                document.CountMax = countMax;
+            }
+
+            return View("Index", documentList);
         }
 
-        //Create
+        ////----------------------------------------------Create//----------------------------------------------
         [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
             return View("Create");
-        }
-
-        private async Task<List<string>> GetEmailListAsync()
-        {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string userId = user.Id;
-
-            var emailList = _context.Users
-                .Where(u => u.Id != userId)
-                .Select(u => u.Email)
-                .ToList();
-
-            return emailList;
-        }
-        public async Task<JsonResult> GetEmailList()
-        {
-            var emailList = await GetEmailListAsync();
-            return Json(emailList);
         }
 
         [Authorize]
@@ -115,6 +110,24 @@ namespace Certify.Controllers
 
         }
 
+        private async Task<List<string>> GetEmailListAsync()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string userId = user.Id;
+
+            var emailList = _context.Users
+                .Where(u => u.Id != userId)
+                .Select(u => u.Email)
+                .ToList();
+
+            return emailList;
+        }
+        public async Task<JsonResult> GetEmailList()
+        {
+            var emailList = await GetEmailListAsync();
+            return Json(emailList);
+        }
+
         [HttpGet]
         public async Task<IActionResult> CheckEmailExistsAsync(string email)
         {
@@ -128,15 +141,15 @@ namespace Certify.Controllers
             return user.Id;
         }
 
-        //Info
+        ////----------------------------------------------Info//----------------------------------------------
         [HttpGet]
         public async Task<IActionResult> InfoAsync(int id)
         {
             DocumentViewModel document = _mapper.Map<Document, DocumentViewModel>(_context.Documents.Find(id));
             SelectUserSigned(document);
 
-            ViewBag.IsUserSignatuer = await IsUserSignaturer(document);
-            ViewBag.IsUserOwner = await IsUserOwner(document);
+            ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
+            ViewBag.IsUserOwner = await IsUserOwner(document.Id);
 
 
             if (document == null)
@@ -152,20 +165,20 @@ namespace Certify.Controllers
         }
 
 
-        private async Task<bool> IsUserSignaturer(DocumentViewModel document)
+        public async Task<bool> IsUserSignaturer(int documentId)
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
-            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == document.Id && s.UserId == currentUser.Id && s.IsSigned == null);
+            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentId && s.UserId == currentUser.Id && s.IsSigned == null);
 
             return isUserSignatuer;
         }
 
-        private async Task<bool> IsUserOwner(DocumentViewModel document)
+        public async Task<bool> IsUserOwner(int documentId)
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
-            bool isUserOwner = _context.Documents.Any(d => d.Id == document.Id && d.UserId == currentUser.Id);
+            bool isUserOwner = _context.Documents.Any(d => d.Id == documentId && d.UserId == currentUser.Id);
 
             return isUserOwner;
         }

@@ -9,6 +9,10 @@ namespace Certify.ViewModels.Mapping
         {
             this.CreateMap<Document, DocumentViewModel>();
             this.CreateMap<DocumentViewModel, Document>();
+            this.CreateMap<Document, DocumentIndex>()
+               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+               .ForMember(dest => dest.FileURL, opt => opt.MapFrom(src => src.FileURL));
         }
     }
 }

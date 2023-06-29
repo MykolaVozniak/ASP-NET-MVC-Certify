@@ -35,13 +35,13 @@ namespace Certify.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ShortDescription")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<DateTime>("UploadedDate")
                         .HasColumnType("datetime2");
@@ -71,7 +71,7 @@ namespace Certify.Migrations
                     b.Property<bool?>("IsSigned")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("SingedDate")
+                    b.Property<DateTime>("SignedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
