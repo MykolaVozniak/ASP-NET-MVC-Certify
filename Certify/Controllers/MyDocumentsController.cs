@@ -6,14 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http.Extensions;
-=======
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
 
->>>>>>> origin/dev
 
 namespace Certify.Controllers
 {
@@ -147,30 +142,22 @@ namespace Certify.Controllers
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
             return user.Id;
         }
-<<<<<<< HEAD
         [HttpGet]
 
 
         //Info
-        public async Task<IActionResult> Info(int id)
-=======
 
-        //Info
         [HttpGet]
         public async Task<IActionResult> InfoAsync(int id)
->>>>>>> origin/dev
         {
             DocumentInfo documentInfo = new();
             documentInfo.DocumentDI = _context.Documents.Find(id);
 
             SelectUserSigned(documentInfo);
-<<<<<<< HEAD
             await UserRoleDefiningAsync(documentInfo);
-=======
             ViewBag.IsUserSignatuer = await IsUserSignaturer(documentInfo);
             ViewBag.IsUserOwner = await IsUserOwner(documentInfo);
 
->>>>>>> origin/dev
             if (documentInfo.DocumentDI == null)
             {
                 return NotFound();
