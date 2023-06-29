@@ -129,12 +129,12 @@ namespace Certify.Controllers
 
 
         //Info
-        public IActionResult Info(int id)
+        public async Task<IActionResult> Info(int id)
         {
             DocumentInfo documentInfo = new();
             documentInfo.DocumentDI = _context.Documents.Find(id);
             SelectUserSigned(documentInfo);
-
+            await UserRoleDefiningAsync(documentInfo);
             if (documentInfo.DocumentDI == null)
             {
                 return NotFound();
@@ -146,6 +146,14 @@ namespace Certify.Controllers
                 return View(documentInfo);
             }
         }
+        private async Task UserRoleDefiningAsync(DocumentInfo documentInfo)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            bool? isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentInfo.DocumentDI.Id && s.UserId == currentUser.Id && s.IsSigned == null);
+            ViewBag.IsUserSignatuer = isUserSignatuer;
+        }
+
 
         //Method exist User Signature
         private void SelectUserSigned(DocumentInfo tm)
