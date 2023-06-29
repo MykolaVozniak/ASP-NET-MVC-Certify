@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
 
-
 namespace Certify.Controllers
 {
     public class MyDocumentsController : Controller
@@ -57,6 +56,7 @@ namespace Certify.Controllers
 
             ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
         }
+
 
         [Authorize]
         [HttpPost]
@@ -136,7 +136,6 @@ namespace Certify.Controllers
             SelectUserSigned(documentInfo);
             ViewBag.IsUserSignatuer = await IsUserSignaturer(documentInfo);
             ViewBag.IsUserOwner = await IsUserOwner(documentInfo);
-
             if (documentInfo.DocumentDI == null)
             {
                 return NotFound();
@@ -148,6 +147,7 @@ namespace Certify.Controllers
                 return View(documentInfo);
             }
         }
+
 
         private async Task<bool> IsUserSignaturer(DocumentInfo documentInfo)
         {
