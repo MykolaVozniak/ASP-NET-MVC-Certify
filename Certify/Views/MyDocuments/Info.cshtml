@@ -53,9 +53,9 @@
             <div class="container col-md-11">
                 <hr />
                 <p class="pt-3">
-                    "@Model.DocumentDI.ShortDescription"
+                    <i class="bi bi-chevron-double-left"></i>@Model.DocumentDI.ShortDescription<i class="bi bi-chevron-double-right"></i>
                 </p>
-                <div class=" pt-3">
+                <div class="pt-3">
                     @{
                         if (ViewBag.SignedTrue.Count > 0)
                         {
@@ -85,6 +85,18 @@
                             }
                         }
                     }
+                    @{
+                        if (ViewBag.IsUserSignatuer == true)
+                        {
+                            <p class=""> SIGNATURE  / NOT SIGNATURE</p>
+                        }
+                        if (ViewBag.IsUserOwner == true)
+                        {
+                            <p class=""> EDIT / DELETE</p>
+                        }
+                        }
+                    <a href="@Url.Content(Model.DocumentDI.FileURL)" download>Download</a>
+                        
                 </div>
             </div>
 

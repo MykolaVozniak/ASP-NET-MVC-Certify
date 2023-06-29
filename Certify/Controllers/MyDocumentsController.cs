@@ -128,11 +128,14 @@ namespace Certify.Controllers
 
         //Info
         [HttpGet]
-        public IActionResult Info(int id)
+        public async Task<IActionResult> InfoAsync(int id)
         {
             DocumentInfo documentInfo = new();
             documentInfo.DocumentDI = _context.Documents.Find(id);
+
             SelectUserSigned(documentInfo);
+            ViewBag.IsUserSignatuer = await IsUserSignaturer(documentInfo);
+            ViewBag.IsUserOwner = await IsUserOwner(documentInfo);
 
             if (documentInfo.DocumentDI == null)
             {
@@ -146,12 +149,30 @@ namespace Certify.Controllers
             }
         }
 
+        private async Task<bool> IsUserSignaturer(DocumentInfo documentInfo)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentInfo.DocumentDI.Id && s.UserId == currentUser.Id && s.IsSigned == null);
+
+            return isUserSignatuer;
+        }
+
+        private async Task<bool> IsUserOwner(DocumentInfo documentInfo)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            bool isUserOwner = _context.Documents.Any(d => d.Id == documentInfo.DocumentDI.Id && d.UserId == currentUser.Id);
+
+            return isUserOwner;
+        }
+
         //Method exist User Signature
-        private void SelectUserSigned(DocumentInfo tm)
+        private void SelectUserSigned(DocumentInfo documentInfo)
         {
             var signedUsers = _context.Signatures
                     .Include(s => s.User)
-                    .Where(s => s.DocumentId == tm.DocumentDI.Id)
+                    .Where(s => s.DocumentId == documentInfo.DocumentDI.Id)
                     .Select(s => new
                     {
                         IsSigned = s.IsSigned,
@@ -168,10 +189,6 @@ namespace Certify.Controllers
             ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
                                              .Select(s => s.UserDescription)
                                              .ToList();
-
-            //isIUserSignaturer - тру -> поточний юзер = в табличці з підписами цей документ і налл
-            //фолс - шо лібо з цього не вірно
-            //isMyDocument - 1 якшо це мій док
         }
     }
 }

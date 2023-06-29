@@ -1,0 +1,21 @@
+asp new mvc
+viev i cpntroller
+magaz, manager
+croot-interface
+bd - entity framework
+
+meet - вт чт 10.
+
+тг чат.
+
+сайт з crood interface`ом (менеджмент)
+jujkjityyz/ ferwsjy/ магаз/ притулок для тварин
+магаз квартир / фільтрація пошук
+кінотеатр.
+
+ботстрап
+
+туду лісти, записок, витрат (менеджери)
+не робити специфічне
+
+https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures
