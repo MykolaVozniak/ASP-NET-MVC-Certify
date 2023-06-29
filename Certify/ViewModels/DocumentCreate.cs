@@ -4,16 +4,17 @@ namespace Certify.ViewModels
 {
     public class DocumentCreate
     {
-        [Required(ErrorMessage = ("Add file"))]
+        [Required(ErrorMessage = ("Attach the file"))]
         public IFormFile UploadedFile { get; set; }
 
         [StringLength(50, MinimumLength = 1)]
-        [Required(ErrorMessage = ("Enter name file"))]
+        [Required(ErrorMessage = ("Enter the file name"))]
         public string Title { get; set; }
 
         [StringLength(250, MinimumLength = 2)]
+        [Required(ErrorMessage = ("Enter the file description"))]
         public string? ShortDescription { get; set; }
-        [Required(ErrorMessage ="Miminum one user")]
+        [Required(ErrorMessage = "Select at least one user to send")]
         public string UserEmail { get; set; }
     }
 }

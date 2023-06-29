@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
-
+using AutoMapper;
 
 namespace Certify.Controllers
 {
@@ -17,12 +17,14 @@ namespace Certify.Controllers
         private readonly CertifyDbContext _context;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
+        private readonly IMapper _mapper;
 
-        public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
+        public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager, IMapper mapper)
         {
             _context = context;
             _appEnvironment = appEnvironment;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         //Index
@@ -57,7 +59,6 @@ namespace Certify.Controllers
             var emailList = await GetEmailListAsync();
             return Json(emailList);
         }
-        
 
 
         [Authorize]
@@ -127,22 +128,19 @@ namespace Certify.Controllers
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
             return user.Id;
         }
-        [HttpGet]
-
 
         //Info
 
-        [HttpGet]
         public async Task<IActionResult> InfoAsync(int id)
         {
-            DocumentInfo documentInfo = new();
-            documentInfo.DocumentDI = _context.Documents.Find(id);
+            DocumentViewModel document = _mapper.Map<Document, DocumentViewModel>(_context.Documents.Find(id));
+            SelectUserSigned(document);
+            ViewBag.IsUserSignatuer = await IsUserSignaturer(document);
+            ViewBag.IsUserOwner = await IsUserOwner(document);
 
-            SelectUserSigned(documentInfo);
-            ViewBag.IsUserSignatuer = await IsUserSignaturer(documentInfo);
-            ViewBag.IsUserOwner = await IsUserOwner(documentInfo);
 
-            if (documentInfo.DocumentDI == null)
+
+            if (document == null)
             {
                 return NotFound();
             }
@@ -150,36 +148,36 @@ namespace Certify.Controllers
             {
                 ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
                 ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
-                return View(documentInfo);
+                return View(document);
             }
         }
 
 
-
-        private async Task<bool> IsUserSignaturer(DocumentInfo documentInfo)
+        private async Task<bool> IsUserSignaturer(DocumentViewModel document)
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
-            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentInfo.DocumentDI.Id && s.UserId == currentUser.Id && s.IsSigned == null);
+            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == document.Id && s.UserId == currentUser.Id && s.IsSigned == null);
+
 
             return isUserSignatuer;
         }
 
-        private async Task<bool> IsUserOwner(DocumentInfo documentInfo)
+        private async Task<bool> IsUserOwner(DocumentViewModel document)
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
-            bool isUserOwner = _context.Documents.Any(d => d.Id == documentInfo.DocumentDI.Id && d.UserId == currentUser.Id);
+            bool isUserOwner = _context.Documents.Any(d => d.Id == document.Id && d.UserId == currentUser.Id);
 
             return isUserOwner;
         }
 
         //Method exist User Signature
-        private void SelectUserSigned(DocumentInfo documentInfo)
+        private void SelectUserSigned(DocumentViewModel document)
         {
             var signedUsers = _context.Signatures
                     .Include(s => s.User)
-                    .Where(s => s.DocumentId == documentInfo.DocumentDI.Id)
+                    .Where(s => s.DocumentId == document.Id)
                     .Select(s => new
                     {
                         IsSigned = s.IsSigned,
