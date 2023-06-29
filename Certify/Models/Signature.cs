@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public bool? IsSigned { get; set; }
-        public DateTime SingedDate { get; set; }
+        public DateTime SignedDate { get; set; }
 
 
         public int DocumentId { get; set; }

@@ -1,4 +1,5 @@
 using Certify.Data;
+using Certify.Data.Servises;
 using Certify.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,11 @@ namespace Certify
 
             builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<CertifyDbContext>();
+            builder.Services.AddTransient<NotificationServices>();
+
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

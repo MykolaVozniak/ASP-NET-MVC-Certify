@@ -1,9 +1,11 @@
 ﻿using Certify.Data;
 using Certify.Models;
+using Certify.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace Certify.Controllers
 {
@@ -25,12 +27,21 @@ namespace Certify.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             string userId = user.Id;
             var documents = _context.Signatures
-             .Where(s => s.UserId == userId && s.IsSigned == null)
-             .Select(s => s.Document)
-             .ToList();
+                .Where(s => s.UserId == userId && s.IsSigned != null) //змінити на !=
+                .Select(s => new MySignatureViewModel
+                {
+                    Id = s.DocumentId,
+                    SignedDate = s.SignedDate,
+                    IsSigned = s.IsSigned,
+                    Title = s.Document.Title,
+                    FileURL = s.Document.FileURL
+                })
+                .ToList();
 
             return View("Index", documents);
         }
+
+
 
     }
 }

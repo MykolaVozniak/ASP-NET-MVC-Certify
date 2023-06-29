@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Certify.Data.Servises
+@inject NotificationServices notificationService
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
@@ -27,17 +29,31 @@
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
                         {
+                            
+                            
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="MySignatures" asp-action="Index">My Signatures</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="MyDocuments" asp-action="Index">My Documents</a>
                             </li>
-                            <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Notifications" asp-action="Index">Notifications <i class="bi bi-envelope-exclamation"></i>
+                            @if (await notificationService.IsNotification())
+                            {
+                                <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Notifications" asp-action="Index">Notifications 
+                                            <i class="bi bi-envelope-exclamation"></i>
+                                        </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Notifications" asp-action="Index">Notifications 
+                                            <i class="bi bi-envelope-open"></i>
+                                        </a>
+                                </li>   
+                            }
 
-                            </a>
-                            </li>
                         }
                         else
                         {
@@ -71,3 +87,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
