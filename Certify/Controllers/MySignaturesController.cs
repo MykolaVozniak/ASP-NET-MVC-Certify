@@ -20,15 +20,9 @@ namespace Certify.Controllers
             _appEnvironment = appEnvironment;
             _userManager = userManager;
         }
-        public async Task<IActionResult> IndexAsync()
+        public IActionResult Index()
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string userId = user.Id;
-            var signature = _context.Signatures
-            .Where(s => s.UserId == userId && s.IsSigned == null)
-            .ToListAsync();
-
-            return View("Index", signature);
+            return View("Index");
         }
     }
 }

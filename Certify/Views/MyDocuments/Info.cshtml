@@ -1,8 +1,8 @@
-﻿@model Certify.ViewModels.DocumentInfo;
+﻿@model Certify.ViewModels.DocumentViewModel;
 @using Microsoft.AspNetCore.Http.Extensions;
 
 @{
-    ViewData["Title"] = Model.DocumentDI.Title;
+    ViewData["Title"] = Model.Title;
     string returnUrl = ViewBag.ReturnUrl;
     string currentUrl = ViewBag.CurrentUrl;
 }
@@ -44,7 +44,7 @@
 
                 <div class="col-md-7 col-sm-7 col-lg-7 display-6 text-break">
                     <p class="mb-1 mt-1">
-                        @Model.DocumentDI.Title
+                        @Model.Title
                     </p>
                 </div>
 
@@ -53,7 +53,7 @@
             <div class="container col-md-11">
                 <hr />
                 <p class="pt-3">
-                    <i class="bi bi-chevron-double-left"></i>@Model.DocumentDI.ShortDescription<i class="bi bi-chevron-double-right"></i>
+                    <i class="bi bi-chevron-double-left"></i>@Model.ShortDescription<i class="bi bi-chevron-double-right"></i>
                 </p>
                 <div class="pt-3">
                     @{
@@ -95,7 +95,7 @@
                             <p class=""> EDIT / DELETE</p>
                         }
                         }
-                    <a href="@Url.Content(Model.DocumentDI.FileURL)" download>Download</a>
+                    <a href="@Url.Content(Model.FileURL)" download>Download</a>
                         
                 </div>
             </div>
