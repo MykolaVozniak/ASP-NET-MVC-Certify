@@ -57,22 +57,7 @@ namespace Certify.Controllers
             var emailList = await GetEmailListAsync();
             return Json(emailList);
         }
-        /*private async Task SelectUserAsync()
-        {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string userId = user.Id;
-
-            var userList = _context.Users
-                .Where(u => u.Id != userId)
-                .Select(u => new
-                {
-                    Id = u.Id,
-                    DisplayName = $"{u.Firstname} {u.Lastname} ({u.Email})"
-                })
-                .ToList();
-
-            ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
-        }*/
+        
 
 
         [Authorize]
@@ -154,7 +139,6 @@ namespace Certify.Controllers
             documentInfo.DocumentDI = _context.Documents.Find(id);
 
             SelectUserSigned(documentInfo);
-            await UserRoleDefiningAsync(documentInfo);
             ViewBag.IsUserSignatuer = await IsUserSignaturer(documentInfo);
             ViewBag.IsUserOwner = await IsUserOwner(documentInfo);
 
@@ -169,13 +153,7 @@ namespace Certify.Controllers
                 return View(documentInfo);
             }
         }
-        private async Task UserRoleDefiningAsync(DocumentInfo documentInfo)
-        {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
-            bool? isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentInfo.DocumentDI.Id && s.UserId == currentUser.Id && s.IsSigned == null);
-            ViewBag.IsUserSignatuer = isUserSignatuer;
-        }
 
 
         private async Task<bool> IsUserSignaturer(DocumentInfo documentInfo)

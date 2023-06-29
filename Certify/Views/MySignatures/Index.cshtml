@@ -2,67 +2,44 @@
 @using Certify.Data;
 @using Certify.Models;
 @using Microsoft.AspNetCore.Identity;
+@using System.IO;
 @inject UserManager<User> _userManager
-@model List<Certify.Models.Signature>
-
+@model List<Certify.Models.Document>
 
 @{
-    ViewData["Title"] = "My Signatures";
+    ViewData["Title"] = "My Signature";
 }
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>Information about your signatures is here</p>
-    <i class="bi bi-box-seam"></i>
+    <p>List of your signature is here...</p>
 </div>
 
-@{
+<div class="container row text-center g-3">
 
-    <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Document</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">From user</th>                
-                    <th scope="col">Data</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var signature in Model)
-            {
-                                <tr class="align-middle">
-                                    <td>
-                                        <div >
-                                            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"  target="_blank">
-                                                    <i class="bi bi-file-earmark-text display-1"></i>
-                                                    <h5>@signature.Document.Title</h5>
-                                            </a>
+   @{
+        var currentUser = await _userManager.GetUserAsync(Context.User);
 
-                                        </div>
-                                    </td>
-                                            <td>@signature.Document.ShortDescription</td>
-                                            <td>
-
-                        @{
-                            var user = await _userManager.FindByIdAsync(signature.Document.UserId.ToString());
-                            var userName = user != null ? user.Firstname : "Unknown User";
-                        }
-                        @userName
-                                            </td>
-                                            <td>@signature.Document.UploadedDate</td>
-                                    <td>
-                                        <div class="btn-group">
-                                                <i class="fa-solid fa-info"></i>
-
-                                                <i class="fa-solid fa-pen-to-square"></i>
-
-                                                <i class="fa-regular fa-trash-can"></i>
-
-                                        </div>
-                                    </td>
-                                </tr>
-            }
-            </tbody>
-    </table>
-}
+        for (int i = Model.Count - 1; i >= 0; i--)
+        {
+            var f = Model[i];
+                            <div class="col-md-2">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@f.Id">
+                                @{
+                                    string generatedIconName = $"bi-filetype-{f.FileURL.Substring(f.FileURL.LastIndexOf('.') + 1)}";
+                                    string standartIconName = "bi-file-earmark";
+                                }
+                                            <i class="bi @standartIconName @generatedIconName display-1"></i>
+                                            <p class="mb-0 mt-1 text-truncate">@f.Title</p>
+                                            <hr class="mb-1 mt-1" />
+                                            <p class="mb-0 text-muted"><small><i class="bi bi-pen"></i></small> 0 / 0 </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+            
+        }
+    }
 </div>
