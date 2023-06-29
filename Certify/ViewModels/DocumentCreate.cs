@@ -13,6 +13,7 @@ namespace Certify.ViewModels
 
         [StringLength(250, MinimumLength = 2)]
         public string? ShortDescription { get; set; }
+        [Required(ErrorMessage ="Miminum one user")]
         public string UserEmail { get; set; }
     }
 }

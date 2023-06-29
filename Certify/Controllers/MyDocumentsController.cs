@@ -36,11 +36,27 @@ namespace Certify.Controllers
         [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
-            await SelectUserAsync();
             return View("Create");
         }
 
-        private async Task SelectUserAsync()
+        private async Task<List<string>> GetEmailListAsync()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string userId = user.Id;
+
+            var emailList = _context.Users
+                .Where(u => u.Id != userId)
+                .Select(u => u.Email)
+                .ToList();
+
+            return emailList;
+        }
+        public async Task<JsonResult> GetEmailList()
+        {
+            var emailList = await GetEmailListAsync();
+            return Json(emailList);
+        }
+        /*private async Task SelectUserAsync()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             string userId = user.Id;
@@ -55,7 +71,7 @@ namespace Certify.Controllers
                 .ToList();
 
             ViewBag.UserList = new SelectList(userList, "Id", "DisplayName");
-        }
+        }*/
 
 
         [Authorize]
@@ -65,7 +81,6 @@ namespace Certify.Controllers
 
             if (!ModelState.IsValid)
             {
-                await SelectUserAsync();
                 return View("Create", dasc);
             }
 
@@ -115,9 +130,10 @@ namespace Certify.Controllers
         }
 
         [HttpGet]
-        public IActionResult CheckEmailExists(string email)
+        public async Task<IActionResult> CheckEmailExistsAsync(string email)
         {
-            bool exists = _context.Users.Any(u => u.Email == email);
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            bool exists = _context.Users.Any(u => u.Email == email && u.Id != currentUser.Id);
             return Json(new { exists });
         }
         private string GetUserIdByEmail(string email)
@@ -134,8 +150,11 @@ namespace Certify.Controllers
             documentInfo.DocumentDI = _context.Documents.Find(id);
 
             SelectUserSigned(documentInfo);
+
             ViewBag.IsUserSignatuer = await IsUserSignaturer(documentInfo);
             ViewBag.IsUserOwner = await IsUserOwner(documentInfo);
+
+
             if (documentInfo.DocumentDI == null)
             {
                 return NotFound();
