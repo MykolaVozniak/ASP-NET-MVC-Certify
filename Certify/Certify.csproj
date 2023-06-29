@@ -28,4 +28,8 @@
     <Folder Include="wwwroot\Documents\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Data.csproj" />
+  </ItemGroup>
+
 </Project>
