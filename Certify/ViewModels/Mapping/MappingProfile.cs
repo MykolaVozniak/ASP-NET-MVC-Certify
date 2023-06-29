@@ -9,7 +9,6 @@ namespace Certify.ViewModels.Mapping
         {
             this.CreateMap<Document, DocumentViewModel>();
             this.CreateMap<DocumentViewModel, Document>();
-
         }
     }
 }
