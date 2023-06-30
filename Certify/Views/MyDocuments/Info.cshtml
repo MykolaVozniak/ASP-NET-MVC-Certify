@@ -25,7 +25,7 @@
 
             <div class="row align-items-center flex-nowrap">
 
-                <div class="col-md-3 col-sm-3 col-lg-3 col display-1 d-flex justify-content-end">
+                <div class="col-md-2 col display-1 d-flex justify-content-end">
                     @{
                         if (ViewBag.SignedFalse.Count == 0 && ViewBag.SignedNull.Count == 0)
                         {
@@ -42,7 +42,7 @@
                     }
                 </div>
 
-                <div class="col-md-7 col-sm-7 col-lg-7 display-6 text-break">
+                <div class="col-md-8 display-6 text-break">
                     <p class="mb-1 mt-1">
                         @Model.Title
                     </p>
@@ -51,58 +51,77 @@
             </div>
 
             <div class="container col-md-11">
+
                 <hr />
-                <p class="pt-3">
+                <p class="mt-3 ">
                     <i class="bi bi-chevron-double-left"></i>@Model.ShortDescription<i class="bi bi-chevron-double-right"></i>
                 </p>
-                <div class="pt-3">
-                    @{
-                        if (ViewBag.SignedTrue.Count > 0)
-                        {
-                            <p class="">Signed by</p>
-                            foreach (var i in ViewBag.SignedTrue)
-                            {
-                                <span class="badge bg-success bg-opacity-75 text-white">@i.ToString()</span>
-                                <br>
-                            }
-                        }
-                        if (ViewBag.SignedFalse.Count > 0)
-                        {
-                            <p class="">Not signed by</p>
-                            foreach (var i in ViewBag.SignedFalse)
-                            {
-                                <span class="badge bg-danger bg-opacity-75 text-white">@i.ToString()</span>
-                                <br>
-                            }
-                        }
-                        if (ViewBag.SignedNull.Count > 0)
-                        {
-                            <p class="mb-0">Under consideration by</p>
-                            foreach (var i in ViewBag.SignedNull)
-                            {
-                                <span class="badge bg-warning bg-opacity-75 text-black">@i.ToString()</span>
-                                <br>
-                            }
-                        }
-                    }
+
+                <div class="row justify-content-center flex-nowrap mt-4">
+                    <a href="@Url.Content(Model.FileURL)" download class="btn btn-primary btn-block col-md-12">Download</a>
+                </div>
+
+                <div class=" mt-5">
                     @{
                         if (ViewBag.IsUserSignatuer == true)
                         {
-                            <p class=""> SIGNATURE  / NOT SIGNATURE</p>
+                            <form asp-action="ChangeStatus" asp-controller="MySignatures" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <div class="row justify-content-center flex-nowrap">
+                                    <button type="submit" name="status" value="true" class="btn btn-success col-md-3 mx-4"><small><i class="bi bi-check-square"></i> <i class="bi bi-pen"></i></small>  Sign</button>
+                                    <button type="submit" name="status" value="false" class="btn btn-danger col-md-3 mx-4"><small><i class="bi bi-x-square"></i> <i class="bi bi-pen"></i></small>  Don't sign</button>
+                                </div>
+                            </form>
                         }
                         if (ViewBag.IsUserOwner == true)
                         {
                             <p class=""> EDIT / DELETE</p>
                         }
-                        }
-                    <a href="@Url.Content(Model.FileURL)" download>Download</a>
-                        
+                    }
+                </div>
+
+                <div class="card bg-white mt-4">
+                    <div class="card-body">
+                        <div class="row flex-nowrap d-flex justify-content-center">
+                            @{
+                                if (ViewBag.SignedTrue.Count > 0)
+                                {
+                                    <div class="col-auto text-center">
+                                        <p class="mb-1">Signed by:</p>
+                                        @foreach (var i in ViewBag.SignedTrue)
+                                        {
+                                            <span class="badge bg-success bg-opacity-75 text-white text-truncate">@i.ToString()</span>
+                                            <br>
+                                        }
+                                    </div>
+                                }
+                                if (ViewBag.SignedFalse.Count > 0)
+                                {
+                                    <div class="col-auto  text-center">
+                                        <p class="mb-1">Not signed by:</p>
+                                        @foreach (var i in ViewBag.SignedFalse)
+                                        {
+                                            <span class="badge bg-danger bg-opacity-75 text-white text-truncate">@i.ToString()</span>
+                                            <br>
+                                        }
+                                    </div>
+                                }
+                                if (ViewBag.SignedNull.Count > 0)
+                                {
+                                    <div class="col-auto  text-center">
+                                        <p class="mb-1">Under consideration by:</p>
+                                        @foreach (var i in ViewBag.SignedNull)
+                                        {
+                                            <span class="badge bg-warning bg-opacity-75 text-black text-truncate">@i.ToString()</span>
+                                            <br>
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
-            @if (ViewBag.IsUserSignatuer == null)
-            {
-          <p class=""> SIGNATURE  / NOT SIGNATURE</p>
-            }
         </div>
     </div>
 </div>
