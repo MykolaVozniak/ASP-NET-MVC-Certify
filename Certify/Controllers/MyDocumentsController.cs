@@ -1,14 +1,13 @@
-﻿using Certify.Data;
+﻿using AutoMapper;
+using Certify.Data;
 using Certify.Models;
 using Certify.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
-using AutoMapper;
 
 namespace Certify.Controllers
 {
