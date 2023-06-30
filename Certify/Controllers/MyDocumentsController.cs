@@ -1,14 +1,15 @@
-﻿using Certify.Data;
+﻿using AutoMapper;
+using Certify.Data;
 using Certify.Models;
 using Certify.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
-using AutoMapper;
+using System.IO;
+using static System.Net.WebRequestMethods;
 
 namespace Certify.Controllers
 {
@@ -48,6 +49,44 @@ namespace Certify.Controllers
             return View("Index", documentList);
         }
 
+        //----------------------------------------------Delete----------------------------------------------
+        [Authorize]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var document = _context.Documents.Find(id);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (document != null && await IsUserOwner(id))
+            {
+                var signatures = _context.Signatures.Where(s => s.DocumentId == document.Id);
+                _context.Signatures.RemoveRange(signatures);
+
+                string filePath = _appEnvironment.WebRootPath + document.FileURL;
+                string folderPath = Path.GetDirectoryName(filePath);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+
+                    if (Directory.Exists(folderPath) && !Directory.EnumerateFiles(folderPath).Any())
+                    {
+                        Directory.Delete(folderPath);
+                    }
+                }
+
+                _context.Documents.Remove(document);
+                _context.SaveChanges();
+
+                TempData["alertMessage"] = "Product was successfully deleted!";
+
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         ////----------------------------------------------Create//----------------------------------------------
         [Authorize]
         public async Task<IActionResult> CreateAsync()
@@ -82,11 +121,14 @@ namespace Certify.Controllers
             {
                 return View("Create", dasc);
             }
-
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            string path = "/Documents/" + dasc.UploadedFile.FileName;
+            string time = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-            using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+            string filePath = "/Documents/" + $"/{user.Id}-{time}/" + dasc.UploadedFile.FileName;
+            string folderPath = Path.Combine(_appEnvironment.WebRootPath, "Documents", $"{user.Id}-{time}");
+            Directory.CreateDirectory(folderPath);
+
+            using (var fileStream = new FileStream(_appEnvironment.WebRootPath + filePath, FileMode.Create))
             {
                 await dasc.UploadedFile.CopyToAsync(fileStream);
             }
@@ -95,7 +137,7 @@ namespace Certify.Controllers
             {
                 Title = dasc.Title,
                 ShortDescription = dasc.ShortDescription,
-                FileURL = path,
+                FileURL = filePath,
                 UserId = user.Id,
                 UploadedDate = DateTime.Now
             };
@@ -152,8 +194,6 @@ namespace Certify.Controllers
             SelectUserSigned(document);
             ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
             ViewBag.IsUserOwner = await IsUserOwner(document.Id);
-
-
 
             if (document == null)
             {

@@ -31,7 +31,7 @@ namespace Certify.Controllers
 
             if (signature != null && rightUser)
             {
-                if(status)
+                if (status)
                 {
                     signature.IsSigned = true;
                 }
@@ -75,5 +75,8 @@ namespace Certify.Controllers
 
             return View("Index", documents);
         }
+
+
+    
     }
 }

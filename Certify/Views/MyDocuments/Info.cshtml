@@ -58,7 +58,7 @@
                 </p>
 
                 <div class="row justify-content-center flex-nowrap mt-4">
-                    <a href="@Url.Content(Model.FileURL)" download class="btn btn-primary btn-block col-md-12">Download</a>
+                    <a href="@Url.Content(Model.FileURL)" download class="btn btn-primary btn-block col-md-12"><i class="bi bi-download"></i> Download</a>
                 </div>
 
                 <div class=" mt-5">
@@ -75,7 +75,10 @@
                         }
                         if (ViewBag.IsUserOwner == true)
                         {
-                            <p class=""> EDIT / DELETE</p>
+                            <form asp-action="Delete" asp-controller="MyDocuments" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-danger">Видалити</button>
+                            </form>
                         }
                     }
                 </div>
