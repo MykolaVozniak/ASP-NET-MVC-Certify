@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+<<<<<<< HEAD
 using System.IO;
 using static System.Net.WebRequestMethods;
+=======
+>>>>>>> origin/dev2
 
 namespace Certify.Controllers
 {
