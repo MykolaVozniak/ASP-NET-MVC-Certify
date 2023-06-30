@@ -1,60 +1,57 @@
-﻿@using System.Security.Policy;
-@using Certify.Data;
-@using Certify.Models;
+﻿@*@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> _userManager*@
 @using Certify.ViewModels;
-@using Microsoft.AspNetCore.Identity;
-@using System.IO;
-@inject UserManager<User> _userManager
 @model List<MySignatureViewModel>
 
 @{
     ViewData["Title"] = "My Signature";
+    //var currentUser = await _userManager.GetUserAsync(Context.User);
 }
 
 <div class="text-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
-
     <p>List of your signature is here...</p>
 </div>
 
+@{
+    if (Model.Count == 0)
+    {
+        <div class="text-center mt-5 pt-5">
+            <i class="bi bi-brightness-alt-high display-1"></i>
+            <h5>It looks like the list of documents you have signed is empty for now...</h5>
+        </div>
+    }
+}
+
 <div class="container row text-center g-3">
-
-   @{
-        var currentUser = await _userManager.GetUserAsync(Context.User);
-
+    @{
         for (int i = Model.Count - 1; i >= 0; i--)
         {
             var models = Model[i];
-                            <div class="col-md-2">
-                                
-                                    <div class="card-body card bg-light h-100">
-                                        <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@models.Id">
-                                        @{
-                                            if(models.IsSigned == false)
-                                            {
-                                                    string generatedIconName = $"bi-filetype-{models.FileURL.Substring(models.FileURL.LastIndexOf('.') + 1)}";
-                                                    string standartIconName = "bi-file-earmark";
-                                                    <i class="bi @standartIconName @generatedIconName display-1 text-danger"></i>                                            
-                                                    <p class="mb-0 mt-1 text-truncate">@models.Title</p>
-                                                    <hr class="mb-1 mt-1" />
-                                                                    <p class="mb-0 text-muted "><i class="bi bi-x-circle text-danger">  </i><small>  @models.SignedDate.ToString("dd/MM/yyyy")</small></p>
-                                            }
-                                            else
-                                            {
-                                                    string generatedIconName = $"bi-filetype-{models.FileURL.Substring(models.FileURL.LastIndexOf('.') + 1)}";
-                                                    string standartIconName = "bi-file-earmark";
-                                                    <i class="bi @standartIconName @generatedIconName display-1 text-success"></i>                                            
-                                                    <p class="mb-0 mt-1 text-truncate">@models.Title</p>
-                                                    <hr class="mb-1 mt-1" />
-                                                    <p class=" mb-0 text-muted "><i class="bi bi-check-circle text-success">  </i><small> @models.SignedDate.ToString("dd/MM/yyyy")</small></p>
-                                            }
-                                       
-                                        }
-
-                                        </a>
-                                    </div>
-                            </div>
-            
+            <div class="col-md-2">
+                <div class="card-body card bg-light h-100">
+                    <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@models.Id">
+                        @{
+                            string generatedIconName = $"bi-filetype-{models.FileURL.Substring(models.FileURL.LastIndexOf('.') + 1)}";
+                            string standartIconName = "bi-file-earmark";
+                            if (models.IsSigned == false)
+                            {
+                                <i class="bi @standartIconName @generatedIconName display-1 text-danger"></i>
+                                <p class="mb-0 mt-1 text-truncate">@models.Title</p>
+                                <hr class="mb-1 mt-1" />
+                                <p class="mb-0 text-muted "><i class="bi bi-x-circle text-danger"> </i><small> @models.SignedDate.ToString("dd/MM/yyyy")</small></p>
+                            }
+                            else
+                            {
+                                <i class="bi @standartIconName @generatedIconName display-1 text-success"></i>
+                                <p class="mb-0 mt-1 text-truncate">@models.Title</p>
+                                <hr class="mb-1 mt-1" />
+                                <p class=" mb-0 text-muted "><i class="bi bi-check-circle text-success"> </i><small> @models.SignedDate.ToString("dd/MM/yyyy")</small></p>
+                            }
+                        }
+                    </a>
+                </div>
+            </div>
         }
     }
 </div>

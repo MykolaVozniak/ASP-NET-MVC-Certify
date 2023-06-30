@@ -13,6 +13,16 @@
     <p>List of your notification is here...</p>
 </div>
 
+@{
+    if (Model.Count == 0)
+    {
+        <div class="text-center mt-5 pt-5">
+            <i class="bi bi-wind  display-1"></i>
+            <h5>It looks like your notification list is empty...</h5>
+        </div>
+    }
+}
+
 <div class="container col-md-7">
     <div class="row g-3">
         @{

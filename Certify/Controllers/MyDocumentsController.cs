@@ -8,11 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-<<<<<<< HEAD
-using System.IO;
-using static System.Net.WebRequestMethods;
-=======
->>>>>>> origin/dev2
 
 namespace Certify.Controllers
 {
@@ -88,6 +83,32 @@ namespace Certify.Controllers
             {
                 return NotFound();
             }
+        }
+
+        //----------------------------------------------ChangeStatus----------------------------------------------
+        public async Task<IActionResult> ChangeStatusAsync(bool status, int id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var signature = _context.Signatures.FirstOrDefault(s => s.DocumentId == id && s.UserId == user.Id);
+
+            bool rightUser = await IsUserSignaturer(id);
+
+            if (signature != null && rightUser)
+            {
+                if (status)
+                {
+                    signature.IsSigned = true;
+                }
+                else if (!status)
+                {
+                    signature.IsSigned = false;
+                }
+
+                signature.SignedDate = DateTime.Now;
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index","Notifications");
         }
 
         ////----------------------------------------------Create//----------------------------------------------

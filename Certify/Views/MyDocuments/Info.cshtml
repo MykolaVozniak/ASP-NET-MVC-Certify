@@ -65,7 +65,7 @@
                     @{
                         if (ViewBag.IsUserSignatuer == true)
                         {
-                            <form asp-action="ChangeStatus" asp-controller="MySignatures" method="post">
+                            <form asp-action="ChangeStatus" asp-controller="MyDocuments" method="post">
                                 <input type="hidden" name="id" value="@Model.Id" />
                                 <div class="row justify-content-center flex-nowrap">
                                     <button type="submit" name="status" value="true" class="btn btn-success col-md-3 mx-4"><small><i class="bi bi-check-square"></i> <i class="bi bi-pen"></i></small>  Sign</button>

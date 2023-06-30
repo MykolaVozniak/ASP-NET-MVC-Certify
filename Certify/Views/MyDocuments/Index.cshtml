@@ -1,10 +1,5 @@
-﻿@using System.Security.Policy;
-@using Certify.Data;
-@using Certify.Models;
-@using Microsoft.AspNetCore.Identity;
-@using System.IO;
-@inject UserManager<User> _userManager
-@model List<Certify.ViewModels.DocumentIndex>
+﻿@using Certify.ViewModels
+@model List<DocumentIndex>
 
 @{
     ViewData["Title"] = "My Documents";
@@ -29,27 +24,25 @@
     </div>
 
     @{
-        var currentUser = await _userManager.GetUserAsync(Context.User);
-
         for (int i = Model.Count - 1; i >= 0; i--)
         {
             var d = Model[i];
-                <div class="col-md-2">
-                    <div class="card bg-light h-100">
-                        <div class="card-body">
-                            <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@d.Id">
-                                @{
-                                    string generatedIconName = $"bi-filetype-{d.FileURL.Substring(d.FileURL.LastIndexOf('.') + 1)}";
-                                    string standartIconName = "bi-file-earmark";
-                                }
-                                <i class="bi @standartIconName @generatedIconName display-1"></i>
-                                <p class="mb-0 mt-1 text-truncate">@d.Title</p>
-                                <hr class="mb-1 mt-1" />
-                                <p class="mb-0 text-muted"><small><i class="bi bi-pen"></i></small> @d.CountTrue / @d.CountMax </p>
-                            </a>
-                        </div>
+            <div class="col-md-2">
+                <div class="card bg-light h-100">
+                    <div class="card-body">
+                        <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@d.Id">
+                            @{
+                                string generatedIconName = $"bi-filetype-{d.FileURL.Substring(d.FileURL.LastIndexOf('.') + 1)}";
+                                string standartIconName = "bi-file-earmark";
+                            }
+                            <i class="bi @standartIconName @generatedIconName display-1"></i>
+                            <p class="mb-0 mt-1 text-truncate">@d.Title</p>
+                            <hr class="mb-1 mt-1" />
+                            <p class="mb-0 text-muted"><small><i class="bi bi-pen"></i></small> @d.CountTrue / @d.CountMax </p>
+                        </a>
                     </div>
                 </div>
+            </div>
         }
     }
 </div>
