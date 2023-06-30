@@ -30,7 +30,7 @@
                                     <div class="card-body card bg-light h-100">
                                         <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@models.Id">
                                         @{
-                                            if(models.IsSigned == true)
+                                            if(models.IsSigned == false)
                                             {
                                                     string generatedIconName = $"bi-filetype-{models.FileURL.Substring(models.FileURL.LastIndexOf('.') + 1)}";
                                                     string standartIconName = "bi-file-earmark";
