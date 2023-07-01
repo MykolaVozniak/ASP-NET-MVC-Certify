@@ -61,7 +61,7 @@ namespace Certify.Controllers
             return View("Index", documentList);
         }
 
-        ////----------------------------------------------Info//----------------------------------------------
+        //----------------------------------------------Info----------------------------------------------
         [HttpGet]
         public async Task<IActionResult> InfoAsync(int id)
         {
@@ -161,8 +161,6 @@ namespace Certify.Controllers
                 _context.Documents.Remove(document);
                 _context.SaveChanges();
 
-                TempData["alertMessage"] = "Product was successfully deleted!";
-
                 return RedirectToAction(nameof(Index));
             }
             else
@@ -197,7 +195,7 @@ namespace Certify.Controllers
             return RedirectToAction("Index","Notifications");
         }
 
-        ////----------------------------------------------Create//----------------------------------------------
+        //----------------------------------------------Create----------------------------------------------
         [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
