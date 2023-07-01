@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Certify.Migrations
 {
     [DbContext(typeof(CertifyDbContext))]
-    [Migration("20230629194408_Init")]
+    [Migration("20230701192234_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
