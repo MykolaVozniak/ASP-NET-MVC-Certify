@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Certify.Controllers
 {
@@ -147,7 +148,8 @@ namespace Certify.Controllers
 
         public async Task<IActionResult> InfoAsync(int id)
         {
-            DocumentViewModel document = _mapper.Map<Document, DocumentViewModel>(_context.Documents.Find(id));
+            Document doc = await _context.Documents.Include(d => d.User).FirstAsync(d => d.Id == id);
+            DocumentViewModel document = _mapper.Map<Document, DocumentViewModel>(doc);
             SelectUserSigned(document);
             ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
             ViewBag.IsUserOwner = await IsUserOwner(document.Id);
@@ -164,6 +166,63 @@ namespace Certify.Controllers
                 ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
                 return View(document);
             }
+        }
+
+        public IActionResult Edit(int id)
+        {
+            DocumentEdit? document = _mapper.Map<Document, DocumentEdit>(_context.Documents.Find(id));
+
+            if (document == null)
+            {
+                return NotFound();
+            }
+
+            return View(document);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(int id, DocumentEdit updatedDocument)
+        {
+            Document? document = _context.Documents.Find(id);
+
+            if (document == null)
+            {
+                return NotFound();
+            }
+
+            document.Title = updatedDocument.Title;
+            document.ShortDescription = updatedDocument.ShortDescription;
+
+            _context.Documents.Update(document);
+            _context.SaveChanges();
+
+            if(updatedDocument.UserEmail != null)
+            {
+                var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
+                var signatures = new List<Signature>();
+                var selectedEmails = JsonConvert.DeserializeObject<List<string>>(updatedDocument.UserEmail);
+                foreach (var userEmail in selectedEmails)
+                {
+                    string userId = GetUserIdByEmail(userEmail);
+                    if (userId != null)
+                    {
+                        var signature = new Signature
+                        {
+                            IsSigned = null,
+                            DocumentId = lastDocument.Id,
+                            UserId = userId
+                        };
+
+                        signatures.Add(signature);
+                    }
+                }
+                _context.Signatures.AddRange(signatures);
+
+                _context.SaveChanges();
+            }
+           
+
+            return RedirectToAction("Info", new { id = document.Id });
         }
 
 

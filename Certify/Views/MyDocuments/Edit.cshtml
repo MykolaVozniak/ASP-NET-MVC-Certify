@@ -3,7 +3,7 @@
 @using Certify.Models;
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> _userManager
-@model Certify.ViewModels.DocumentCreate
+@model Certify.ViewModels.DocumentEdit
 @{
     ViewData["Title"] = "Add Document";
 }
@@ -13,7 +13,7 @@
             <h1 class="display-4">@ViewData["Title"]</h1>
         </div>
         <hr/>
-        <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3" onsubmit="checkBadgeCount(event)">
+        <form asp-action="Edit" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3" onsubmit="checkBadgeCount(event)">
 
             <div class="col-12">
                 <label asp-for="Title" class="form-label">Title</label>
@@ -36,10 +36,10 @@
                 <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
         <div class="col-6">
-            <a asp-action="Index" class="btn btn-secondary w-100  mt-md-4">Back</a>
+            <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-md-4">Back</a>
         </div>
         <div class="col-6">
-            <button type="submit" class="btn btn-primary w-100 mt-md-4">Create</button>
+            <button type="submit" class="btn btn-warning w-100 mt-md-4"><small><i class="bi bi-pencil-square"></i></small> Edit</button>
         </div>
     </form>
 </div>
@@ -61,7 +61,7 @@
         badgeElement.textContent = email;
 
 
-         var iconElement = document.createElement('i');
+        var iconElement = document.createElement('i');
         iconElement.classList.add('bi', 'bi-x', 'ms-1');
         badgeElement.appendChild(iconElement);
         // Додаємо обробник події для видалення badge при кліку
@@ -105,24 +105,10 @@
         userEmailInput.value = JSON.stringify(selectedEmails);
     }
 
-    // Перевірка на кількість badges
-    function checkBadgeCount(event) {
-        if (selectedEmails.length === 0) {
-            errorMessageEmpty.textContent = 'Введіть хоча б один електронний адрес';
-            errorMessageEmpty.style.display = 'block';
-            errorMessageNotFound.textContent = '';
-            errorMessageNotFound.style.display = 'none';
-            event.preventDefault(); // Зупинити відправку форми, якщо відсутні електронні адреси
-        } else {
-            errorMessageEmpty.textContent = '';
-            errorMessageEmpty.style.display = 'none';
-        }
-    }
 
     fetch('/MyDocuments/GetEmailList')
     .then(response => response.json())
     .then(data => {
-        // Populate the datalist with email options
         var emailList = document.getElementById('email-list');
         data.forEach(email => {
             var option = document.createElement('option');
