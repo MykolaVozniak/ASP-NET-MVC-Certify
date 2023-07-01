@@ -5,6 +5,7 @@
 using System;
 using System.Threading.Tasks;
 using Certify.Models;
+using Data.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

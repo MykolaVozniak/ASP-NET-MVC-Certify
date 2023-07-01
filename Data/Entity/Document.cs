@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Certify.Models
+namespace Data.Entity
 {
     public class Document
     {
@@ -17,6 +17,5 @@ namespace Certify.Models
 
         public User User { get; set; }
         public ICollection<Signature> Signatures { get; set; }
-
     }
 }

@@ -1,7 +1,6 @@
-using Certify.Data;
-using Certify.Data.Servises;
-using Certify.Models;
-using Microsoft.AspNetCore.Identity;
+using Data;
+using Data.Entity;
+using Data.Servises;
 using Microsoft.EntityFrameworkCore;
 
 namespace Certify
@@ -14,7 +13,7 @@ namespace Certify
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            builder.Services.AddDbContext<CertifyDbContext>(options =>options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<CertifyDbContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)

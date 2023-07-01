@@ -1,4 +1,6 @@
-﻿namespace Certify.Models
+﻿using System.Reflection.Metadata;
+
+namespace Data.Entity
 {
     public class Signature
     {

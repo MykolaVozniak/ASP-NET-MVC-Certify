@@ -1,11 +1,12 @@
-﻿using Certify.Models;
+﻿using Data.Entity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
-namespace Certify.Data.Servises
+namespace Data.Servises
 {
     public class NotificationServices
     {
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<User>? _userManager;
         private readonly CertifyDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
