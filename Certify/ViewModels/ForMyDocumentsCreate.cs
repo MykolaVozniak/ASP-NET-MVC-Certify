@@ -2,7 +2,7 @@
 
 namespace Certify.ViewModels
 {
-    public class DocumentCreate
+    public class ForMyDocumentsCreate
     {
         [Required(ErrorMessage = ("Attach the file"))]
         public IFormFile UploadedFile { get; set; }

@@ -28,7 +28,7 @@ namespace Certify.Controllers
             string userId = user.Id;
             var documents = _context.Signatures
                 .Where(s => s.UserId == userId && s.IsSigned != null) //змінити на !=
-                .Select(s => new MySignatureViewModel
+                .Select(s => new ForMySignaturesIndex
                 {
                     Id = s.DocumentId,
                     SignedDate = s.SignedDate,

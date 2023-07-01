@@ -33,18 +33,104 @@ namespace Certify.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
             var documents = _context.Documents.Where(d => d.UserId == user.Id).ToList();
-            List<DocumentIndex> documentList = _mapper.Map<List<Document>, List<DocumentIndex>>(documents);
+            List<ForMyDocumentsIndex> documentList = _mapper.Map<List<Document>, List<ForMyDocumentsIndex>>(documents);
 
             foreach (var document in documentList)
             {
-                int countTrue = _context.Signatures.Count(s => s.DocumentId == document.Id && s.IsSigned == true);
-                int countMax = _context.Signatures.Count(s => s.DocumentId == document.Id);
+                int currentSignaturesCount = _context.Signatures.Count(s => s.DocumentId == document.Id && s.IsSigned != null);
+                int maxSignaturesCount = _context.Signatures.Count(s => s.DocumentId == document.Id);
+                bool isFalseSignatureExist = _context.Signatures.Any(s => s.DocumentId == document.Id && s.IsSigned == false);
 
-                document.CountTrue = countTrue;
-                document.CountMax = countMax;
+                document.CurrentSignaturesCount = currentSignaturesCount;
+                document.MaxSignaturesCount = maxSignaturesCount;
+
+                if(isFalseSignatureExist)
+                {
+                    document.IsSigned = false;
+                }
+                else if(currentSignaturesCount != maxSignaturesCount)
+                {
+                    document.IsSigned = null;
+                }
+                else
+                {
+                    document.IsSigned = true;
+                }
             }
 
             return View("Index", documentList);
+        }
+
+        ////----------------------------------------------Info//----------------------------------------------
+        [HttpGet]
+        public async Task<IActionResult> InfoAsync(int id)
+        {
+            ForMyDocumentsInfo document = _mapper.Map<Document, ForMyDocumentsInfo>(_context.Documents.Find(id));
+            SelectUserSigned(document);
+            ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
+            ViewBag.IsUserOwner = await IsUserOwner(document.Id);
+
+            if (document == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+                ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
+                return View(document);
+            }
+        }
+
+        private void SelectUserSigned(ForMyDocumentsInfo document)
+        {
+            var signedUsers = _context.Signatures
+                    .Include(s => s.User)
+                    .Where(s => s.DocumentId == document.Id)
+                    .Select(s => new
+                    {
+                        IsSigned = s.IsSigned,
+                        UserDescription = $"{s.User.Firstname} {s.User.Lastname} ({s.User.Email})"
+                    })
+                    .ToList();
+
+            ViewBag.SignedTrue = signedUsers.Where(s => s.IsSigned == true)
+                                            .Select(s => s.UserDescription)
+                                            .ToList();
+            ViewBag.SignedNull = signedUsers.Where(s => s.IsSigned == null)
+                                            .Select(s => s.UserDescription)
+                                            .ToList();
+            ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
+                                             .Select(s => s.UserDescription)
+                                             .ToList();
+        }
+
+        public async Task<bool> IsUserSignaturer(int documentId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return false;
+            }
+
+            User? currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentId && s.UserId == currentUser.Id && s.IsSigned == null);
+
+            return isUserSignatuer;
+        }
+
+        public async Task<bool> IsUserOwner(int documentId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return false;
+            }
+
+            User? currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+            bool isUserOwner = _context.Documents.Any(d => d.Id == documentId && d.UserId == currentUser.Id);
+
+            return isUserOwner;
         }
 
         //----------------------------------------------Delete----------------------------------------------
@@ -138,7 +224,7 @@ namespace Certify.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddFile(DocumentCreate dasc)
+        public async Task<IActionResult> AddFile(ForMyDocumentsCreate dasc)
         {
 
             if (!ModelState.IsValid)
@@ -157,14 +243,11 @@ namespace Certify.Controllers
                 await dasc.UploadedFile.CopyToAsync(fileStream);
             }
 
-            var document = new Document
-            {
-                Title = dasc.Title,
-                ShortDescription = dasc.ShortDescription,
-                FileURL = filePath,
-                UserId = user.Id,
-                UploadedDate = DateTime.Now
-            };
+            Document document = _mapper.Map<ForMyDocumentsCreate, Document>(dasc);
+            document.UploadedDate = DateTime.Now;
+            document.FileURL = filePath;
+            document.UserId = user.Id;
+
             _context.Documents.Add(document);
             await _context.SaveChangesAsync();
 
@@ -206,73 +289,6 @@ namespace Certify.Controllers
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
             return user.Id;
-        }
-
-
-        ////----------------------------------------------Info//----------------------------------------------
-        [HttpGet]
-
-        public async Task<IActionResult> InfoAsync(int id)
-        {
-            DocumentViewModel document = _mapper.Map<Document, DocumentViewModel>(_context.Documents.Find(id));
-            SelectUserSigned(document);
-            ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
-            ViewBag.IsUserOwner = await IsUserOwner(document.Id);
-
-            if (document == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
-                ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
-                return View(document);
-            }
-        }
-
-
-        public async Task<bool> IsUserSignaturer(int documentId)
-        {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentId && s.UserId == currentUser.Id && s.IsSigned == null);
-
-
-            return isUserSignatuer;
-        }
-
-        public async Task<bool> IsUserOwner(int documentId)
-        {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-            bool isUserOwner = _context.Documents.Any(d => d.Id == documentId && d.UserId == currentUser.Id);
-
-            return isUserOwner;
-        }
-
-        //Method exist User Signature
-        private void SelectUserSigned(DocumentViewModel document)
-        {
-            var signedUsers = _context.Signatures
-                    .Include(s => s.User)
-                    .Where(s => s.DocumentId == document.Id)
-                    .Select(s => new
-                    {
-                        IsSigned = s.IsSigned,
-                        UserDescription = $"{s.User.Firstname} {s.User.Lastname} ({s.User.Email})"
-                    })
-                    .ToList();
-
-            ViewBag.SignedTrue = signedUsers.Where(s => s.IsSigned == true)
-                                            .Select(s => s.UserDescription)
-                                            .ToList();
-            ViewBag.SignedNull = signedUsers.Where(s => s.IsSigned == null)
-                                            .Select(s => s.UserDescription)
-                                            .ToList();
-            ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
-                                             .Select(s => s.UserDescription)
-                                             .ToList();
         }
     }
 }

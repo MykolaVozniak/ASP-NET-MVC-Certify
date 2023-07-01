@@ -1,0 +1,19 @@
+White - Black
+
+Gray - DarkGray
+
+Blue - DarkBlue
+Green - DarkGreen
+Cyan - DarkCyan
+Red - DarkRed
+Magenta - DarkMagenta
+Yellow - DarkYellow
+
+
+
+
+
+
+
+
+

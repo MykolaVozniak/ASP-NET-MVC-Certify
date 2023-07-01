@@ -1,7 +1,7 @@
 ﻿@*@using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> _userManager*@
 @using Certify.ViewModels;
-@model List<MySignatureViewModel>
+@model List<ForMySignaturesIndex>
 
 @{
     ViewData["Title"] = "My Signature";
@@ -27,26 +27,26 @@
     @{
         for (int i = Model.Count - 1; i >= 0; i--)
         {
-            var models = Model[i];
+            var d = Model[i];
             <div class="col-md-2">
                 <div class="card-body card bg-light h-100">
-                    <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@models.Id">
+                    <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@d.Id">
                         @{
-                            string generatedIconName = $"bi-filetype-{models.FileURL.Substring(models.FileURL.LastIndexOf('.') + 1)}";
+                            string generatedIconName = $"bi-filetype-{d.FileURL.Substring(d.FileURL.LastIndexOf('.') + 1)}";
                             string standartIconName = "bi-file-earmark";
-                            if (models.IsSigned == false)
+                            if (d.IsSigned == true)
                             {
-                                <i class="bi @standartIconName @generatedIconName display-1 text-danger"></i>
-                                <p class="mb-0 mt-1 text-truncate">@models.Title</p>
+                                <i class="bi @standartIconName @generatedIconName display-1 text-success"></i>
+                                <p class="mb-0 mt-1 text-truncate">@d.Title</p>
                                 <hr class="mb-1 mt-1" />
-                                <p class="mb-0 text-muted "><i class="bi bi-x-circle text-danger"> </i><small> @models.SignedDate.ToString("dd/MM/yyyy")</small></p>
+                                <p class=" mb-0 text-muted "><i class="bi bi-check-circle text-success"> </i><small> @d.SignedDate.ToString("dd/MM/yyyy")</small></p>
                             }
                             else
                             {
-                                <i class="bi @standartIconName @generatedIconName display-1 text-success"></i>
-                                <p class="mb-0 mt-1 text-truncate">@models.Title</p>
+                                <i class="bi @standartIconName @generatedIconName display-1 text-danger"></i>
+                                <p class="mb-0 mt-1 text-truncate">@d.Title</p>
                                 <hr class="mb-1 mt-1" />
-                                <p class=" mb-0 text-muted "><i class="bi bi-check-circle text-success"> </i><small> @models.SignedDate.ToString("dd/MM/yyyy")</small></p>
+                                <p class="mb-0 text-muted "><i class="bi bi-x-circle text-danger"> </i><small> @d.SignedDate.ToString("dd/MM/yyyy")</small></p> 
                             }
                         }
                     </a>

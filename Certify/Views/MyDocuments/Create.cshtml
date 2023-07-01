@@ -1,44 +1,44 @@
-﻿    @using System.Security.Policy;
-    @using Certify.Data;
-    @using Certify.Models;
-    @using Microsoft.AspNetCore.Identity;
-    @inject UserManager<User> _userManager
-    @model Certify.ViewModels.DocumentCreate
-    @{
-        ViewData["Title"] = "Add Document";
-    }
+﻿@using System.Security.Policy;
+@using Certify.Data;
+@using Certify.Models;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> _userManager
+@model Certify.ViewModels.ForMyDocumentsCreate
+@{
+    ViewData["Title"] = "Add Document";
+}
 
-    <div class="container col-md-6">
-        <div class="text-center text-uppercase">
-            <h1 class="display-4">@ViewData["Title"]</h1>
+<div class="container col-md-6">
+    <div class="text-center text-uppercase">
+        <h1 class="display-4">@ViewData["Title"]</h1>
+    </div>
+    <hr />
+    <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3" onsubmit="checkBadgeCount(event)">
+        <div class="col-12">
+            <label class="form-label">Upload File</label>
+            <input type="file" name="uploadedFile" class="form-control" />
+            <span asp-validation-for="UploadedFile" class="text-danger"></span>
         </div>
-        <hr/>
-        <form asp-action="AddFile" asp-controller="MyDocuments" method="post" enctype="multipart/form-data" class="container-fluid row g-3" onsubmit="checkBadgeCount(event)">
-            <div class="col-12">
-                <label class="form-label">Upload File</label>
-                <input type="file" name="uploadedFile" class="form-control"  />
-                <span asp-validation-for = "UploadedFile"class="text-danger"></span>
-            </div>
-            <div class="col-12">
-                <label asp-for="Title" class="form-label">Title</label>
-                <input asp-for="Title" class="form-control" placeholder="Document title..."  >
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class ="col-12">
-                <label asp-for="ShortDescription" class="form-label">Short Description</label>
-                <input asp-for="ShortDescription" class="form-control" placeholder="This document is very important because...">
-                <span asp-validation-for="ShortDescription" class="text-danger"></span>
-            </div>
-            <div class="col-12">
-                <label class="form-label">User Email</label>
-                <input id="email-input" class="form-control" placeholder="Enter user emails..." list="email-list"  autocomplete="off"/>
-                <datalist id="email-list" class="list-unstyled"></datalist>
-                <div id="badges-container" class="mt-2"></div>
-                <div id="error-message-not-found" class="text-danger"></div>
-                <div id="error-message-empty" class="text-danger"></div>
-                <input type="hidden" id="UserEmail" name="UserEmail" value="" />
-                <span asp-validation-for="UserEmail" class="text-danger"></span>
-            </div>
+        <div class="col-12">
+            <label asp-for="Title" class="form-label">Title</label>
+            <input asp-for="Title" class="form-control" placeholder="Document title...">
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <label asp-for="ShortDescription" class="form-label">Short Description</label>
+            <input asp-for="ShortDescription" class="form-control" placeholder="This document is very important because...">
+            <span asp-validation-for="ShortDescription" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <label class="form-label">User Email</label>
+            <input id="email-input" class="form-control" placeholder="Enter user emails..." list="email-list" autocomplete="off" />
+            <datalist id="email-list" class="list-unstyled"></datalist>
+            <div id="badges-container" class="mt-2"></div>
+            <div id="error-message-not-found" class="text-danger"></div>
+            <div id="error-message-empty" class="text-danger"></div>
+            <input type="hidden" id="UserEmail" name="UserEmail" value="" />
+            <span asp-validation-for="UserEmail" class="text-danger"></span>
+        </div>
         <div class="col-6">
             <a asp-action="Index" class="btn btn-secondary w-100  mt-md-4">Back</a>
         </div>
@@ -65,7 +65,7 @@
         badgeElement.textContent = email;
 
 
-         var iconElement = document.createElement('i');
+        var iconElement = document.createElement('i');
         iconElement.classList.add('bi', 'bi-x', 'ms-1');
         badgeElement.appendChild(iconElement);
         // Додаємо обробник події для видалення badge при кліку
@@ -124,16 +124,16 @@
     }
 
     fetch('/MyDocuments/GetEmailList')
-    .then(response => response.json())
-    .then(data => {
-        // Populate the datalist with email options
-        var emailList = document.getElementById('email-list');
-        data.forEach(email => {
-            var option = document.createElement('option');
-            option.value = email;
-            emailList.appendChild(option);
+        .then(response => response.json())
+        .then(data => {
+            // Populate the datalist with email options
+            var emailList = document.getElementById('email-list');
+            data.forEach(email => {
+                var option = document.createElement('option');
+                option.value = email;
+                emailList.appendChild(option);
+            });
         });
-    });
     // Обробник події для додавання badge при натисканні клавіші Enter у полі вводу
     emailInput.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
