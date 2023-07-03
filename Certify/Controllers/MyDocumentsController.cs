@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using Data.Entity;
 using Certify.ViewModels;
+using Data;
+using Data.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.Globalization;
-using Data;
 
 namespace Certify.Controllers
 {
@@ -34,7 +34,7 @@ namespace Certify.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
             var documents = _context.Documents.Where(d => d.UserId == user.Id).ToList();
-            List<ForMyDocumentsIndex> documentList = _mapper.Map<List<Document>, List<ForMyDocumentsIndex>>(documents);
+            List<ForMyDocumentsIndex> documentList = _mapper.Map<List<Data.Entity.Document>, List<ForMyDocumentsIndex>>(documents);
 
             foreach (var document in documentList)
             {
@@ -45,11 +45,11 @@ namespace Certify.Controllers
                 document.CurrentSignaturesCount = currentSignaturesCount;
                 document.MaxSignaturesCount = maxSignaturesCount;
 
-                if(isFalseSignatureExist)
+                if (isFalseSignatureExist)
                 {
                     document.IsSigned = false;
                 }
-                else if(currentSignaturesCount != maxSignaturesCount)
+                else if (currentSignaturesCount != maxSignaturesCount)
                 {
                     document.IsSigned = null;
                 }
@@ -62,7 +62,6 @@ namespace Certify.Controllers
             return View("Index", documentList);
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //----------------------------------------------Delete----------------------------------------------
         [Authorize]
@@ -71,33 +70,32 @@ namespace Certify.Controllers
             var document = _context.Documents.Find(id);
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            if (document != null && await IsUserOwner(id))
-            {
-                var signatures = _context.Signatures.Where(s => s.DocumentId == document.Id);
-                _context.Signatures.RemoveRange(signatures);
-
-                string filePath = _appEnvironment.WebRootPath + document.FileURL;
-                string folderPath = Path.GetDirectoryName(filePath);
-
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-
-                    if (Directory.Exists(folderPath) && !Directory.EnumerateFiles(folderPath).Any())
-                    {
-                        Directory.Delete(folderPath);
-                    }
-                }
-
-                _context.Documents.Remove(document);
-                _context.SaveChanges();
-
-                return RedirectToAction(nameof(Index));
-            }
-            else
+            if (document == null || !await IsUserOwner(id))
             {
                 return NotFound();
             }
+
+            var signatures = _context.Signatures.Where(s => s.DocumentId == document.Id);
+            _context.Signatures.RemoveRange(signatures);
+
+            string filePath = _appEnvironment.WebRootPath + document.FileURL;
+            string folderPath = Path.GetDirectoryName(filePath);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+
+                if (Directory.Exists(folderPath) && !Directory.EnumerateFiles(folderPath).Any())
+                {
+                    Directory.Delete(folderPath);
+                }
+            }
+
+            _context.Documents.Remove(document);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+
         }
 
         //----------------------------------------------ChangeStatus----------------------------------------------
@@ -123,7 +121,7 @@ namespace Certify.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("Index","Notifications");
+            return RedirectToAction("Index", "Notifications");
         }
 
         //----------------------------------------------Create----------------------------------------------
@@ -133,7 +131,27 @@ namespace Certify.Controllers
             return View("Create");
         }
 
-        private async Task<List<string>> GetEmailListAsync()
+
+            public async Task<JsonResult> GetEmailListEdit(string documentId )
+            {
+                int? currentDocumentId = int.Parse(documentId);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                string userId = user.Id;
+                Console.WriteLine("wtsdfsdfsdfadfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff   ------------- " + documentId);
+                var selectSign =_context.Signatures
+                    .Where(s => s.DocumentId == 4)
+                    .Select(s => s.UserId)
+                    .ToList();
+
+            var emailList = _context.Users
+                    .Where(u => u.Id != userId && selectSign.Contains(u.Id))
+                    .Select(u => u.Email)
+                    .ToList();
+
+            return Json(emailList);
+        }
+
+        public async Task<JsonResult> GetEmailListCreate()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             string userId = user.Id;
@@ -142,15 +160,8 @@ namespace Certify.Controllers
                 .Where(u => u.Id != userId)
                 .Select(u => u.Email)
                 .ToList();
-
-            return emailList;
-        }
-        public async Task<JsonResult> GetEmailList()
-        {
-            var emailList = await GetEmailListAsync();
             return Json(emailList);
         }
-
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddFile(ForMyDocumentsCreate dasc)
@@ -172,7 +183,7 @@ namespace Certify.Controllers
                 await dasc.UploadedFile.CopyToAsync(fileStream);
             }
 
-            Document document = _mapper.Map<ForMyDocumentsCreate, Document>(dasc);
+            Data.Entity.Document document = _mapper.Map<ForMyDocumentsCreate, Data.Entity.Document>(dasc);
             document.UploadedDate = DateTime.Now;
             document.FileURL = filePath;
             document.UserId = user.Id;
@@ -205,7 +216,7 @@ namespace Certify.Controllers
             return RedirectToAction("Index");
         }
 
-        
+
 
         [HttpGet]
         public async Task<IActionResult> CheckEmailExistsAsync(string email)
@@ -224,8 +235,8 @@ namespace Certify.Controllers
         [HttpGet]
         public async Task<IActionResult> InfoAsync(int id)
         {
-            Document doc = await _context.Documents.Include(d => d.User).FirstAsync(d => d.Id == id);
-            ForMyDocumentsInfo document = _mapper.Map<Document, ForMyDocumentsInfo>(doc);
+            Data.Entity.Document doc = await _context.Documents.Include(d => d.User).FirstAsync(d => d.Id == id);
+            ForMyDocumentsInfo document = _mapper.Map<Data.Entity.Document, ForMyDocumentsInfo>(doc);
             SelectUserSigned(document);
             ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
             ViewBag.IsUserOwner = await IsUserOwner(document.Id);
@@ -241,11 +252,12 @@ namespace Certify.Controllers
         }
 
         //----------------------------------------------Edit----------------------------------------------
-        public IActionResult Edit(int id)
+        [Authorize]
+        public async Task<IActionResult> EditAsync(int id)
         {
-            ForMyDocumentsEdit? document = _mapper.Map<Document, ForMyDocumentsEdit>(_context.Documents.Find(id));
+            ForMyDocumentsEdit? document = _mapper.Map<Data.Entity.Document, ForMyDocumentsEdit>(_context.Documents.Find(id));
 
-            if (document == null)
+            if (document == null || !await IsUserOwner(document.Id))
             {
                 return NotFound();
             }
@@ -253,12 +265,13 @@ namespace Certify.Controllers
             return View(document);
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult Edit(int id, ForMyDocumentsEdit updatedDocument)
         {
-            Document? document = _context.Documents.Find(id);
+            Data.Entity.Document? document = _context.Documents.Find(id);
 
-            if (document == null)
+            if (document == null )
             {
                 return NotFound();
             }

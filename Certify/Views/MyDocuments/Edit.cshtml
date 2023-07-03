@@ -34,14 +34,16 @@
                 <div id="error-message-not-found" class="text-danger"></div>
                 <div id="error-message-empty" class="text-danger"></div>
                 <input type="hidden" id="UserEmail" name="UserEmail" value="" />
+                <input type="hidden" name="id" value="@Model.Id" />
+
                 <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
-        <div class="col-6">
-            <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-md-4">Back</a>
-        </div>
-        <div class="col-6">
-            <button type="submit" class="btn btn-warning w-100 mt-md-4"> Edit</button>
-        </div>
+            <div class="col-6">
+                <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-md-4">Back</a>
+            </div>
+            <div class="col-6">
+                <button type="submit" class="btn btn-warning w-100 mt-md-4"> Edit</button>
+            </div>
     </form>
 </div>
 
@@ -107,7 +109,7 @@
     }
 
 
-    fetch('/MyDocuments/GetEmailList')
+fetch('/MyDocuments/GetEmailListEdit/${@Model.Id}')
     .then(response => response.json())
     .then(data => {
         var emailList = document.getElementById('email-list');
