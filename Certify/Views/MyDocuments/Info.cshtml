@@ -9,18 +9,16 @@
 
 <div class="pb-3">
     @{
-        if (returnUrl != "" && returnUrl != currentUrl && returnUrl != null)
+        if (returnUrl.Contains("Edit"))
         {
-            <a href="@returnUrl" class="btn btn-outline-secondary ">
+            <a asp-action="Index" asp-controller="MyDocuments" class="btn btn-outline-secondary ">
                 <i class="bi bi-caret-left"></i>
                 Back
             </a>
         }
-        
-        else if (returnUrl.Contains("Edit"))
+        else if (returnUrl != "" && returnUrl != currentUrl && returnUrl != null)
         {
-            
-            <a asp-action="Index" asp-controller="MyDocuments" class="btn btn-outline-secondary ">
+            <a href="@returnUrl" class="btn btn-outline-secondary ">
                 <i class="bi bi-caret-left"></i>
                 Back
             </a>
