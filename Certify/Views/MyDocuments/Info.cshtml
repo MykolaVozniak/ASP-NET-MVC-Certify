@@ -16,7 +16,17 @@
                 Back
             </a>
         }
+        
+        else if (returnUrl.Contains("Edit"))
+        {
+            
+            <a asp-action="Index" asp-controller="MyDocuments" class="btn btn-outline-secondary ">
+                <i class="bi bi-caret-left"></i>
+                Back
+            </a>
+        }
     }
+    <p>@returnUrl</p>
 </div>
 
 <div class="container col-10">
