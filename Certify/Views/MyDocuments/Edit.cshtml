@@ -6,7 +6,7 @@
 @inject UserManager<User> _userManager
 @model Certify.ViewModels.ForMyDocumentsEdit
 @{
-    ViewData["Title"] = "Add Document";
+    ViewData["Title"] = "Edit Document";
 }
 
     <div class="container col-md-6">
@@ -40,7 +40,7 @@
             <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-md-4">Back</a>
         </div>
         <div class="col-6">
-            <button type="submit" class="btn btn-warning w-100 mt-md-4"><small><i class="bi bi-pencil-square"></i></small> Edit</button>
+            <button type="submit" class="btn btn-warning w-100 mt-md-4"> Edit</button>
         </div>
     </form>
 </div>
