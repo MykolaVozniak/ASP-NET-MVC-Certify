@@ -26,7 +26,7 @@
                 <input asp-for="ShortDescription" class="form-control" placeholder="This document is very important because...">
                 <span asp-validation-for="ShortDescription" class="text-danger"></span>
             </div>
-            <div class="col-12">
+            <div class="col-12" id="document-id" data-id="@Model.Id">
                 <label class="form-label">User Email</label>
                 <input id="email-input" class="form-control" placeholder="Enter user emails..." list="email-list"  autocomplete="off"/>
                 <datalist id="email-list" class="list-unstyled"></datalist>
@@ -34,10 +34,9 @@
                 <div id="error-message-not-found" class="text-danger"></div>
                 <div id="error-message-empty" class="text-danger"></div>
                 <input type="hidden" id="UserEmail" name="UserEmail" value="" />
-                <input type="hidden" name="id" value="@Model.Id" />
-
                 <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
+
             <div class="col-6">
                 <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-md-4">Back</a>
             </div>
@@ -47,104 +46,115 @@
     </form>
 </div>
 
-<script>
-    var badgesContainer = document.getElementById('badges-container');
-    var emailInput = document.getElementById('email-input');
-    var errorMessageNotFound = document.getElementById('error-message-not-found');
-    var errorMessageEmpty = document.getElementById('error-message-empty');
 
-    // Створюємо порожній список для збереження вибраних електронних адрес
-    var selectedEmails = [];
+@section Scripts {
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+                    // Елементи DOM
+                    var badgesContainer = document.getElementById('badges-container');
+                    var emailInput = document.getElementById('email-input');
+                    var errorMessageNotFound = document.getElementById('error-message-not-found');
+                    var errorMessageEmpty = document.getElementById('error-message-empty');
+                    var modelId = document.getElementById('document-id').dataset.id;
+                    var documentId = $("#document-id").data("id");
 
-    // Функція для створення нового badge
-    function createBadge(email) {
-        // Створюємо елемент badge
-        var badgeElement = document.createElement('span');
-        badgeElement.classList.add('badge', 'bg-primary', 'me-1');
-        badgeElement.textContent = email;
+                    // Змінні
+                    var emailList; // Змінна для збереження списку електронних адрес
+                    var selectedEmails = []; // Масив для збереження вибраних електронних адрес
 
+                    // Функція для створення нового badge
+                    function createBadge(email) {
+                        var badgeElement = document.createElement('span');
+                        badgeElement.classList.add('badge', 'bg-primary', 'me-1');
+                        badgeElement.textContent = email;
 
-        var iconElement = document.createElement('i');
-        iconElement.classList.add('bi', 'bi-x', 'ms-1');
-        badgeElement.appendChild(iconElement);
-        // Додаємо обробник події для видалення badge при кліку
-        badgeElement.addEventListener('click', function () {
-            removeBadge(email);
-        });
+                        var iconElement = document.createElement('i');
+                        iconElement.classList.add('bi', 'bi-x', 'ms-1');
+                        badgeElement.appendChild(iconElement);
 
-        // Додаємо badge до контейнера
-        badgesContainer.appendChild(badgeElement);
+                        badgeElement.addEventListener('click', function () {
+                            removeBadge(email);
+                        });
 
-        // Додаємо електронну адресу до списку вибраних
-        selectedEmails.push(email);
-        updateUserEmails();
-        checkBadgeCount();
-    }
+                        badgesContainer.appendChild(badgeElement);
+                        selectedEmails.push(email);
+                        updateUserEmails();
+                    }
 
-    // Функція для видалення badge
-    function removeBadge(email) {
-        // Знаходимо елемент badge за електронною адресою
-        var badgeElements = badgesContainer.getElementsByClassName('badge');
-        for (var i = 0; i < badgeElements.length; i++) {
-            if (badgeElements[i].textContent === email) {
-                // Видаляємо елемент badge з DOM
-                badgeElements[i].parentNode.removeChild(badgeElements[i]);
-                break;
-            }
-        }
+                    // Функція для видалення badge
+                    function removeBadge(email) {
+                        var badgeElements = badgesContainer.getElementsByClassName('badge');
+                        for (var i = 0; i < badgeElements.length; i++) {
+                            if (badgeElements[i].textContent === email) {
+                                badgeElements[i].parentNode.removeChild(badgeElements[i]);
+                                break;
+                            }
+                        }
 
-        // Видаляємо електронну адресу зі списку вибраних
-        var index = selectedEmails.indexOf(email);
-        if (index > -1) {
-            selectedEmails.splice(index, 1);
-            updateUserEmails();
-            checkBadgeCount();
-        }
-    }
+                        var index = selectedEmails.indexOf(email);
+                        if (index > -1) {
+                            selectedEmails.splice(index, 1);
+                            updateUserEmails();
+                        }
+                    }
 
-    function updateUserEmails() {
-        // Оновлюємо значення властивості UserEmail зі значеннями змінної selectedEmails
-        var userEmailInput = document.getElementById('UserEmail');
-        userEmailInput.value = JSON.stringify(selectedEmails);
-    }
+                    // Функція для оновлення значення UserEmail
+                    function updateUserEmails() {
+                        var userEmailInput = document.getElementById('UserEmail');
+                        userEmailInput.value = JSON.stringify(selectedEmails);
+                    }
 
+                    // Функція для завантаження списку електронних адрес
+                    function loadEmailList(documentId) {
+                        $.ajax({
+                            url: '/MyDocuments/GetEmailListEdit',
+                            type: 'GET',
+                            data: { documentId: documentId },
+                            success: function(data) {
+                                emailList = data;
+                                var dataList = $("#email-list");
+                                dataList.empty();
+                                emailList.forEach(function(email) {
+                                    dataList.append("<option value='" + email + "'>" + email + "</option>");
+                                });
+                            },
+                            error: function(error) {
+                                console.error(error);
+                            }
+                        });
+                    }
 
-fetch('/MyDocuments/GetEmailListEdit/${@Model.Id}')
-    .then(response => response.json())
-    .then(data => {
-        var emailList = document.getElementById('email-list');
-        data.forEach(email => {
-            var option = document.createElement('option');
-            option.value = email;
-            emailList.appendChild(option);
-        });
-    });
-    // Обробник події для додавання badge при натисканні клавіші Enter у полі вводу
-    emailInput.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            var email = emailInput.value.trim();
+                    // Обробник події для додавання badge при натисканні клавіші Enter
+                    emailInput.addEventListener('keydown', function (event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            var email = emailInput.value.trim();
+                            if (email !== '' && !selectedEmails.includes(email)) {
+                                checkEmailExists(email);
+                            }
+                            emailInput.value = '';
+                        }
+                    });
 
-            if (email !== '' && !selectedEmails.includes(email)) {
-                // Отримайте відповідні Id користувачів за електронною поштою і додайте до списку selectedEmails
-                fetch('/MyDocuments/CheckEmailExists?email=' + email)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.exists) {
+                    // Функція для перевірки наявності електронної адреси
+                    function checkEmailExists(email) {
+                        if (emailList && emailList.includes(email)) {
                             createBadge(email);
                             errorMessageNotFound.textContent = '';
                             errorMessageNotFound.style.display = 'none';
-                            checkBadgeCount();
+                            errorMessageEmpty.textContent = '';
+                            errorMessageEmpty.style.display = 'none';
                         } else {
-                            errorMessageNotFound.textContent = 'Користувача з введеною електронною адресою не знайдено';
+                                errorMessageNotFound.textContent = 'The user with the entered email address has already received the document for signature';
                             errorMessageNotFound.style.display = 'block';
                             errorMessageEmpty.textContent = '';
                             errorMessageEmpty.style.display = 'none';
                         }
-                    });
-            }
+                    }
 
-            emailInput.value = '';
-        }
-    });
-</script>
+
+
+                    // Завантаження списку електронних адрес
+                    loadEmailList(documentId);
+        </script>
+}

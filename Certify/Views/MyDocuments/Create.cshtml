@@ -113,7 +113,7 @@
     // Перевірка на кількість badges
     function checkBadgeCount(event) {
         if (selectedEmails.length === 0) {
-            errorMessageEmpty.textContent = 'Введіть хоча б один електронний адрес';
+            errorMessageEmpty.textContent = 'Please enter at least one email address';
             errorMessageEmpty.style.display = 'block';
             errorMessageNotFound.textContent = '';
             errorMessageNotFound.style.display = 'none';
@@ -152,7 +152,7 @@
                             errorMessageNotFound.style.display = 'none';
                             checkBadgeCount();
                         } else {
-                            errorMessageNotFound.textContent = 'Користувача з введеною електронною адресою не знайдено';
+                            errorMessageNotFound.textContent = 'The user with the entered email address was not found';
                             errorMessageNotFound.style.display = 'block';
                             errorMessageEmpty.textContent = '';
                             errorMessageEmpty.style.display = 'none';
