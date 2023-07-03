@@ -29,8 +29,8 @@
     <p>@returnUrl</p>
 </div>
 
-<div class="container col-10">
-    <div class="card bg-light">
+<div class="container col-10 ">
+    <div class="card bg-light w-100">
         <div class="card-body">
 
             <div class="row align-items-center flex-nowrap">
@@ -92,7 +92,7 @@
                             <div class="row justify-content-center flex-nowrap ">
 
                                 <a asp-action="Delete" asp-controller="MyDocuments" asp-route-id="@Model.Id" class="col-4 mx-3">
-                                    <button class="btn btn-danger w-100"><small><i class="bi bi-trash3"></i></small> Видалити</button>
+                                    <button class="btn btn-danger w-100"><small><i class="bi bi-trash3"></i></small> Delete</button>
                                 </a>
 
 
@@ -105,7 +105,7 @@
                     }
                 </div>
 
-                <div class="card bg-white mt-4">
+                <div class="card bg-white mt-4 w-100">
                     <div class="card-body">
                         <div class="row flex-nowrap d-flex justify-content-center">
                             @{
