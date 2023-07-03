@@ -1,6 +1,6 @@
-﻿using Certify.Data;
-using Certify.Models;
+﻿using Data.Entity;
 using Certify.ViewModels;
+using Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

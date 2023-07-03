@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Certify.Models;
+using Data.Entity;
 
 namespace Certify.ViewModels.Mapping
 {

@@ -1,7 +1,8 @@
-﻿using Certify.Models;
+﻿using Data.Entity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
-namespace Certify.Data.Servises
+namespace Data.Servises
 {
     public class NotificationServices
     {

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using Certify.Data;
-using Certify.Models;
+using Data.Entity;
 using Certify.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Globalization;
+using Data;
 
 namespace Certify.Controllers
 {
@@ -203,9 +203,9 @@ namespace Certify.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
-
         }
 
+        
 
         [HttpGet]
         public async Task<IActionResult> CheckEmailExistsAsync(string email)
