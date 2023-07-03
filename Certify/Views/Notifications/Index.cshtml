@@ -23,7 +23,7 @@
     }
 }
 
-<div class="container col-md-7">
+<div class="container col-7">
     <div class="row g-3">
         @{
             for (int i = Model.Count - 1; i >= 0; i--)
@@ -34,11 +34,11 @@
                         <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@signature.Document.Id">
                             <div class="row">
 
-                                <div class="col-md-3 d-flex justify-content-center align-items-center">
+                                <div class="col-3 d-flex justify-content-center align-items-center">
                                     <i class="bi bi-box-seam display-1"></i>
                                 </div>
 
-                                <div class="col-md-9">
+                                <div class="col-9">
                                     <div class="row">
                                         <div class="col">
                                             @{
@@ -46,12 +46,12 @@
                                                 string userName = user != null ? (user.Firstname + " " + user.Lastname) : "Unknown User";
                                             }
                                             <p class="fw-bold text-center">Incoming document signing request from @userName.</p>
-                                            <p class="mt-md-1 text-truncate">Document: "@signature.Document.Title"</p>
-                                            <p class="mt-md-1 text-truncate">Description: "@signature.Document.ShortDescription"</p>
+                                            <p class="mt-1 text-truncate">Document: "@signature.Document.Title"</p>
+                                            <p class="mt-1 text-truncate">Description: "@signature.Document.ShortDescription"</p>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12 text-end text-muted mt-md-1">
+                                        <div class="col-12 text-end text-muted mt-1">
                                             @signature.Document.UploadedDate
                                         </div>
                                     </div>

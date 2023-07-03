@@ -9,7 +9,7 @@
     ViewData["Title"] = "Edit Document";
 }
 
-    <div class="container col-md-6">
+    <div class="container col-6">
         <div class="text-center text-uppercase">
             <h1 class="display-4">@ViewData["Title"]</h1>
         </div>
@@ -39,10 +39,10 @@
                 <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
             <div class="col-6">
-                <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-md-4">Back</a>
+                <a asp-action="Info" asp-route-id="@Model.Id" class="btn btn-secondary w-100  mt-4">Back</a>
             </div>
             <div class="col-6">
-                <button type="submit" class="btn btn-warning w-100 mt-md-4"> Edit</button>
+                <button type="submit" class="btn btn-warning w-100 mt-4"> Edit</button>
             </div>
     </form>
 </div>

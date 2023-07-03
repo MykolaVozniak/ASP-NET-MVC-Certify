@@ -1,11 +1,8 @@
-﻿@*@using Microsoft.AspNetCore.Identity;
-@inject UserManager<User> _userManager*@
-@using Certify.ViewModels;
+﻿@using Certify.ViewModels;
 @model List<ForMySignaturesIndex>
 
 @{
     ViewData["Title"] = "My Signature";
-    //var currentUser = await _userManager.GetUserAsync(Context.User);
 }
 
 <div class="text-center">
@@ -28,7 +25,7 @@
         for (int i = Model.Count - 1; i >= 0; i--)
         {
             var d = Model[i];
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="card-body card bg-light h-100">
                     <a class="nav-link text-black text-opacity-75" asp-controller="MyDocuments" asp-action="Info" asp-route-id="@d.Id">
                         @{
