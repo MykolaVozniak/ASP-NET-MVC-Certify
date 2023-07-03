@@ -131,26 +131,19 @@ namespace Certify.Controllers
             return View("Create");
         }
 
-
-            public async Task<JsonResult> GetEmailListEdit(string documentId )
+        [HttpGet]
+        public async Task<JsonResult> GetEmailListEdit( int documentId )
             {
-                int? currentDocumentId = int.Parse(documentId);
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 string userId = user.Id;
-                Console.WriteLine("wtsdfsdfsdfadfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff   ------------- " + documentId);
-                var selectSign =_context.Signatures
-                    .Where(s => s.DocumentId == 4)
-                    .Select(s => s.UserId)
-                    .ToList();
-
-            var emailList = _context.Users
-                    .Where(u => u.Id != userId && selectSign.Contains(u.Id))
+                var unassignedEmails = _context.Users
+                    .Where(u => u.Id != userId && !_context.Signatures.Any(s => s.DocumentId == documentId && s.UserId == u.Id))
                     .Select(u => u.Email)
                     .ToList();
 
-            return Json(emailList);
+                return Json(unassignedEmails);
         }
-
+        
         public async Task<JsonResult> GetEmailListCreate()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
