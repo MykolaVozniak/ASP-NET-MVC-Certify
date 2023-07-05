@@ -1,12 +1,13 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
-namespace Certify.ViewModels
+namespace Certify.Library.ViewModels
 {
-    public class ForMyDocumentsEdit
+    public class ForMyDocumentsCreate
     {
-        
-        public int Id { get; set; }
+        [Required(ErrorMessage = ("Attach the file"))]
+        public IFormFile UploadedFile { get; set; }
+
         [StringLength(80, MinimumLength = 1)]
         [Required(ErrorMessage = ("Enter the file name"))]
         public string Title { get; set; }
@@ -15,6 +16,6 @@ namespace Certify.ViewModels
         [Required(ErrorMessage = ("Enter the file description"))]
         public string? ShortDescription { get; set; }
         [Required(ErrorMessage = "Select at least one user to send")]
-        public string? UserEmail { get; set; }
+        public string UserEmail { get; set; }
     }
 }

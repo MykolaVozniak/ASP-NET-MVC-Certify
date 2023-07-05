@@ -1,8 +1,10 @@
-﻿using Data.Entity;
+﻿using Data;
+using Data.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
-namespace Data.Servises
+namespace Certify.Services.Services
 {
     public class NotificationServices
     {
@@ -23,5 +25,16 @@ namespace Data.Servises
             bool? isNotification = _context.Signatures.Any(s => s.UserId == currentUser.Id && s.IsSigned == null);
             return isNotification ?? false;
         }
+
+        public async Task<List<Signature>> GetPendingSignaturesByUserId()
+        {
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            string userId = user.Id;
+            return await _context.Signatures
+                .Include(s => s.Document)
+                .Where(s => s.UserId == userId && s.IsSigned == null)
+                .ToListAsync();
+        }
     }
 }
+

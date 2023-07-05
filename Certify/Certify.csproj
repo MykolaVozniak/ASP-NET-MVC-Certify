@@ -30,7 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Certify.Services\Certify.Services.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Library\Certify.Library.csproj" />
   </ItemGroup>
 
 </Project>

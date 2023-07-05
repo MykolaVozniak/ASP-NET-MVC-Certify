@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
-using Certify.ViewModels;
+using Certify.Library.ViewModels;
+using Certify.Services.Services;
 using Data;
 using Data.Entity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Certify.Controllers
 {
@@ -18,340 +23,122 @@ namespace Certify.Controllers
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly MyDocumentServices _myDocumentServices;
 
-        public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager, IMapper mapper)
+        public MyDocumentsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager, IMapper mapper, MyDocumentServices myDocumentServices)
         {
             _context = context;
             _appEnvironment = appEnvironment;
             _userManager = userManager;
             _mapper = mapper;
+            _myDocumentServices = myDocumentServices;
         }
 
         //----------------------------------------------Index----------------------------------------------
         [Authorize]
         public async Task<IActionResult> IndexAsync()
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-
-            var documents = _context.Documents.Where(d => d.UserId == user.Id).ToList();
-            List<ForMyDocumentsIndex> documentList = _mapper.Map<List<Data.Entity.Document>, List<ForMyDocumentsIndex>>(documents);
-
-            foreach (var document in documentList)
-            {
-                int currentSignaturesCount = _context.Signatures.Count(s => s.DocumentId == document.Id && s.IsSigned != null);
-                int maxSignaturesCount = _context.Signatures.Count(s => s.DocumentId == document.Id);
-                bool isFalseSignatureExist = _context.Signatures.Any(s => s.DocumentId == document.Id && s.IsSigned == false);
-
-                document.CurrentSignaturesCount = currentSignaturesCount;
-                document.MaxSignaturesCount = maxSignaturesCount;
-
-                if (isFalseSignatureExist)
-                {
-                    document.IsSigned = false;
-                }
-                else if (currentSignaturesCount != maxSignaturesCount)
-                {
-                    document.IsSigned = null;
-                }
-                else
-                {
-                    document.IsSigned = true;
-                }
-            }
-
-            return View("Index", documentList);
+            return View("Index", await _myDocumentServices.GetDocumentForIndexAsync());
         }
-
 
         //----------------------------------------------Delete----------------------------------------------
         [Authorize]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var document = _context.Documents.Find(id);
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-
-            if (document == null || !await IsUserOwner(id))
-            {
+            bool document = _context.Documents.Any(d => d.Id == id);
+            if (document == false || !await _myDocumentServices.IsUserOwner(id))
                 return NotFound();
-            }
 
-            var signatures = _context.Signatures.Where(s => s.DocumentId == document.Id);
-            _context.Signatures.RemoveRange(signatures);
-
-            string filePath = _appEnvironment.WebRootPath + document.FileURL;
-            string folderPath = Path.GetDirectoryName(filePath);
-
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-
-                if (Directory.Exists(folderPath) && !Directory.EnumerateFiles(folderPath).Any())
-                {
-                    Directory.Delete(folderPath);
-                }
-            }
-
-            _context.Documents.Remove(document);
-            _context.SaveChanges();
+            _myDocumentServices.DeleteAsync(id);
 
             return RedirectToAction(nameof(Index));
-
         }
 
-        //----------------------------------------------ChangeStatus----------------------------------------------
-        public async Task<IActionResult> ChangeStatusAsync(bool status, int id)
-        {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            var signature = _context.Signatures.FirstOrDefault(s => s.DocumentId == id && s.UserId == user.Id);
-
-            bool rightUser = await IsUserSignaturer(id);
-
-            if (signature != null && rightUser)
-            {
-                if (status)
-                {
-                    signature.IsSigned = true;
-                }
-                else if (!status)
-                {
-                    signature.IsSigned = false;
-                }
-
-                signature.SignedDate = DateTime.Now;
-                _context.SaveChanges();
-            }
-
-            return RedirectToAction("Index", "Notifications");
-        }
 
         //----------------------------------------------Create----------------------------------------------
+
         [Authorize]
         public async Task<IActionResult> CreateAsync()
         {
             return View("Create");
         }
 
-        [HttpGet]
-        public async Task<JsonResult> GetEmailListEdit( int documentId )
-            {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                string userId = user.Id;
-                var unassignedEmails = _context.Users
-                    .Where(u => u.Id != userId && !_context.Signatures.Any(s => s.DocumentId == documentId && s.UserId == u.Id))
-                    .Select(u => u.Email)
-                    .ToList();
-
-                return Json(unassignedEmails);
-        }
-        
-        public async Task<JsonResult> GetEmailListCreate()
-        {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string userId = user.Id;
-
-            var emailList = _context.Users
-                .Where(u => u.Id != userId)
-                .Select(u => u.Email)
-                .ToList();
-            return Json(emailList);
-        }
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddFile(ForMyDocumentsCreate dasc)
         {
 
             if (!ModelState.IsValid)
-            {
                 return View("Create", dasc);
-            }
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string time = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-            string filePath = "/Documents/" + $"/{user.Id}-{time}/" + dasc.UploadedFile.FileName;
-            string folderPath = Path.Combine(_appEnvironment.WebRootPath, "Documents", $"{user.Id}-{time}");
-            Directory.CreateDirectory(folderPath);
-
-            using (var fileStream = new FileStream(_appEnvironment.WebRootPath + filePath, FileMode.Create))
-            {
-                await dasc.UploadedFile.CopyToAsync(fileStream);
-            }
-
-            Data.Entity.Document document = _mapper.Map<ForMyDocumentsCreate, Data.Entity.Document>(dasc);
-            document.UploadedDate = DateTime.Now;
-            document.FileURL = filePath;
-            document.UserId = user.Id;
-
-            _context.Documents.Add(document);
-            await _context.SaveChangesAsync();
-
-            var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
-            var signatures = new List<Signature>();
-            var selectedEmails = JsonConvert.DeserializeObject<List<string>>(dasc.UserEmail);
-            foreach (var userEmail in selectedEmails)
-            {
-                string userId = GetUserIdByEmail(userEmail);
-                if (userId != null)
-                {
-                    var signature = new Signature
-                    {
-                        IsSigned = null,
-                        DocumentId = lastDocument.Id,
-                        UserId = userId
-                    };
-
-                    signatures.Add(signature);
-                }
-            }
-            _context.Signatures.AddRange(signatures);
-
-            await _context.SaveChangesAsync();
+            await _myDocumentServices.AddFile(dasc);
 
             return RedirectToAction("Index");
         }
 
-
+        [HttpGet]
+        public async Task<JsonResult> GetEmailListCreate()
+        {
+            var emailList = await _myDocumentServices.GetEmailListCreateServices();
+            return new JsonResult(emailList);
+        }
 
         [HttpGet]
-        public async Task<IActionResult> CheckEmailExistsAsync(string email)
+        public async Task<JsonResult> CheckEmailExistsAsync(string email)
         {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            bool exists = _context.Users.Any(u => u.Email == email && u.Id != currentUser.Id);
-            return Json(new { exists });
-        }
-        private string GetUserIdByEmail(string email)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            return user.Id;
+            bool exists = await _myDocumentServices.CheckEmailExistsServices(email);
+            return new JsonResult(new { exists });
         }
 
         //----------------------------------------------Info----------------------------------------------
+
         [HttpGet]
         public async Task<IActionResult> InfoAsync(int id)
         {
-            Data.Entity.Document doc = await _context.Documents.Include(d => d.User).FirstAsync(d => d.Id == id);
-            ForMyDocumentsInfo document = _mapper.Map<Data.Entity.Document, ForMyDocumentsInfo>(doc);
-            SelectUserSigned(document);
-            ViewBag.IsUserSignatuer = await IsUserSignaturer(document.Id);
-            ViewBag.IsUserOwner = await IsUserOwner(document.Id);
-
-            if (document == null)
-            {
+            bool doc = await _context.Documents.AnyAsync(d => d.Id == id);
+            if (!doc)
                 return NotFound();
-            }
             ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
             ViewBag.CurrentUrl = HttpContext.Request.GetDisplayUrl().ToString();
-            return View(document);
+            return View(await _myDocumentServices.InfoAsync(id));
+        }
 
+
+        //----------------------------------------------ChangeStatus----------------------------------------------
+        public async Task<IActionResult> ChangeStatusAsync(bool status, int id)
+        {
+            await _myDocumentServices.ChangeStatusAsync(status, id);
+
+            return RedirectToAction("Index", "Notifications");
         }
 
         //----------------------------------------------Edit----------------------------------------------
         [Authorize]
         public async Task<IActionResult> EditAsync(int id)
         {
-            ForMyDocumentsEdit? document = _mapper.Map<Data.Entity.Document, ForMyDocumentsEdit>(_context.Documents.Find(id));
-
-            if (document == null || !await IsUserOwner(document.Id))
-            {
+            bool document = _context.Documents.Any(d => d.Id == id);
+            if (!document || !await _myDocumentServices.IsUserOwner(id))
                 return NotFound();
-            }
 
-            return View(document);
+            return View(await _myDocumentServices.EditAsync(id));
         }
 
         [Authorize]
         [HttpPost]
-        public IActionResult Edit(int id, ForMyDocumentsEdit updatedDocument)
+        public async Task<IActionResult> EditAsync(int id, ForMyDocumentsEdit updatedDocument)
         {
-            Data.Entity.Document? document = _context.Documents.Find(id);
+            if (!ModelState.IsValid)
+                return View("Edit", updatedDocument);
+            await _myDocumentServices.Edit(id, updatedDocument);
 
-            if (document == null )
-            {
-                return NotFound();
-            }
-
-            document.Title = updatedDocument.Title;
-            document.ShortDescription = updatedDocument.ShortDescription;
-
-            _context.Documents.Update(document);
-            _context.SaveChanges();
-
-            if (updatedDocument.UserEmail != null)
-            {
-                var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
-                var signatures = new List<Signature>();
-                var selectedEmails = JsonConvert.DeserializeObject<List<string>>(updatedDocument.UserEmail);
-                foreach (var userEmail in selectedEmails)
-                {
-                    string userId = GetUserIdByEmail(userEmail);
-                    if (userId != null)
-                    {
-                        var signature = new Signature
-                        {
-                            IsSigned = null,
-                            DocumentId = lastDocument.Id,
-                            UserId = userId
-                        };
-
-                        signatures.Add(signature);
-                    }
-                }
-                _context.Signatures.AddRange(signatures);
-
-                _context.SaveChanges();
-            }
-
-            return RedirectToAction("Info", new { id = document.Id });
+            return RedirectToAction("Info", new{id});
         }
 
-        private void SelectUserSigned(ForMyDocumentsInfo document)
+        [HttpGet]
+        public async Task<JsonResult> GetEmailListEdit(int documentId)
         {
-            var signedUsers = _context.Signatures
-                    .Include(s => s.User)
-                    .Where(s => s.DocumentId == document.Id)
-                    .Select(s => new
-                    {
-                        IsSigned = s.IsSigned,
-                        UserDescription = $"{s.User.Firstname} {s.User.Lastname} ({s.User.Email})"
-                    })
-                    .ToList();
-
-            ViewBag.SignedTrue = signedUsers.Where(s => s.IsSigned == true)
-                                            .Select(s => s.UserDescription)
-                                            .ToList();
-            ViewBag.SignedNull = signedUsers.Where(s => s.IsSigned == null)
-                                            .Select(s => s.UserDescription)
-                                            .ToList();
-            ViewBag.SignedFalse = signedUsers.Where(s => s.IsSigned == false)
-                                             .Select(s => s.UserDescription)
-                                             .ToList();
+            var unassignedEmails = await _myDocumentServices.GetEmailListEditServices(documentId);
+            return Json(unassignedEmails);
         }
 
-        public async Task<bool> IsUserSignaturer(int documentId)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return false;
-            }
-
-            User? currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-            bool isUserSignatuer = _context.Signatures.Any(s => s.DocumentId == documentId && s.UserId == currentUser.Id && s.IsSigned == null);
-
-            return isUserSignatuer;
-        }
-
-        public async Task<bool> IsUserOwner(int documentId)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return false;
-            }
-
-            User? currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-            bool isUserOwner = _context.Documents.Any(d => d.Id == documentId && d.UserId == currentUser.Id);
-
-            return isUserOwner;
-        }
     }
 }

@@ -1,40 +1,22 @@
-﻿using Data;
-using Data.Entity;
+﻿using Certify.Services.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Certify.Controllers
 {
     [Authorize]
     public class NotificationsController : Controller
     {
-        CertifyDbContext _context;
-        IWebHostEnvironment _appEnvironment;
-        private readonly UserManager<User> _userManager;
+        private readonly NotificationServices _notificationServices;
 
-        public NotificationsController(CertifyDbContext context, IWebHostEnvironment appEnvironment, UserManager<User> userManager)
+        public NotificationsController(NotificationServices notificationServices)
         {
-            _context = context;
-            _appEnvironment = appEnvironment;
-            _userManager = userManager;
+            _notificationServices = notificationServices;
         }
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string userId = user.Id;
-            var signatures = await _context.Signatures
-                .Where(s => s.UserId == userId && s.IsSigned == null)
-                .ToListAsync();
-
-            foreach (var signature in signatures)
-            {
-                signature.Document = await _context.Documents.FindAsync(signature.DocumentId);
-            }
-
-            return View("Index", signatures);
+            return View("Index", await _notificationServices.GetPendingSignaturesByUserId());
         }
     }
 }
