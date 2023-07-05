@@ -1,6 +1,7 @@
+using Certify.Services.Mappers;
+using Certify.Services.Services;
 using Data;
 using Data.Entity;
-using Data.Servises;
 using Microsoft.EntityFrameworkCore;
 
 namespace Certify
@@ -19,10 +20,15 @@ namespace Certify
             builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<CertifyDbContext>();
             builder.Services.AddTransient<NotificationServices>();
+            builder.Services.AddTransient<MyDocumentServices>();
+            builder.Services.AddScoped<MySignaturesServices>();
+
+            builder.Services.AddAuthentication();
+
 
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddAutoMapper(typeof(Program).Assembly);
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

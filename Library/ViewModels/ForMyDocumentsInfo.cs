@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Certify.ViewModels
+namespace Certify.Library.ViewModels
 {
     public class ForMyDocumentsInfo
     {
@@ -12,6 +12,14 @@ namespace Certify.ViewModels
         public string UserId { get; set; }
 
 
+        public List<string> SignedTrueUsers { get; set; }
+
+        public List<string> SignedNullUsers { get; set; }
+
+        public List<string> SignedFalseUsers { get; set; }
+
+        public bool IsUserOwner { get; set; }
+        public bool IsUserSignatuer { get; set; }
         public string UserName { get; set; }
         public bool? IsSigned { get; set; }
     }

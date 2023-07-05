@@ -3,7 +3,7 @@
 @using Data.Entity;
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> _userManager
-@model Certify.ViewModels.ForMyDocumentsCreate
+@model Certify.Library.ViewModels.ForMyDocumentsCreate
 
 @{
     ViewData["Title"] = "Add Document";
@@ -82,7 +82,6 @@
         updateUserEmails();
         checkBadgeCount();
     }
-
     // Функція для видалення badge
     function removeBadge(email) {
         // Знаходимо елемент badge за електронною адресою
@@ -108,20 +107,6 @@
         // Оновлюємо значення властивості UserEmail зі значеннями змінної selectedEmails
         var userEmailInput = document.getElementById('UserEmail');
         userEmailInput.value = JSON.stringify(selectedEmails);
-    }
-
-    // Перевірка на кількість badges
-    function checkBadgeCount(event) {
-        if (selectedEmails.length === 0) {
-            errorMessageEmpty.textContent = 'Please enter at least one email address';
-            errorMessageEmpty.style.display = 'block';
-            errorMessageNotFound.textContent = '';
-            errorMessageNotFound.style.display = 'none';
-            event.preventDefault(); // Зупинити відправку форми, якщо відсутні електронні адреси
-        } else {
-            errorMessageEmpty.textContent = '';
-            errorMessageEmpty.style.display = 'none';
-        }
     }
 
     fetch('/MyDocuments/GetEmailListCreate')

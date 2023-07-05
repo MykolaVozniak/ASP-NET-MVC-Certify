@@ -1,4 +1,4 @@
-﻿namespace Certify.ViewModels
+﻿namespace Certify.Library.ViewModels
 {
     public class ForMySignaturesIndex
     {
