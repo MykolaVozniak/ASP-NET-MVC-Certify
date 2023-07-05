@@ -8,17 +8,17 @@ namespace Certify.Services.Mappers
     {
         public MappingProfile()
         {
-            this.CreateMap<Document, ForMyDocumentsInfo>()
+            this.CreateMap<Document, MyDocumentsInfoVM>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Firstname + " " + src.User.Lastname));
-            this.CreateMap<ForMyDocumentsInfo, Document>();
-            this.CreateMap<Document, ForMyDocumentsIndex>();
+            this.CreateMap<MyDocumentsInfoVM, Document>();
+            this.CreateMap<Document, MyDocumentsIndexVM>();
 
-            this.CreateMap<ForMyDocumentsCreate, Document>();
+            this.CreateMap<MyDocumentsCreateVM, Document>();
 
-            this.CreateMap<User, ForMyDocumentsInfo>()
+            this.CreateMap<User, MyDocumentsInfoVM>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Firstname + " " + src.Lastname));
 
-            this.CreateMap<Document, ForMyDocumentsEdit>();
+            this.CreateMap<Document, MyDocumentsEditVM>();
 
 
         }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Certify.Library.ViewModels
 {
-    public class ForMyDocumentsEdit
+    public class MyDocumentsEditVM
     {
         
         public int Id { get; set; }

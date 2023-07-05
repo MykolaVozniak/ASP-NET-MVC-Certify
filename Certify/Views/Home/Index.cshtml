@@ -1,23 +1,58 @@
-﻿@{
+﻿@using Data.Entity;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@{
     ViewData["Title"] = "Home";
 }
 
-<div class="container col-4 text-center text-uppercase">
-    <h1 class="display-5">Welcome to</h1>
-    <h1 class="display-1">Certify</h1>
-    <hr />
+
+<div class="row align-items-center py-3">
+    <div class="col-6">
+        <div class="col-11">
+            <p class="text-secondary display-4 fw-bold">Say goodbye to physical bureaucracy! </p>
+            <h5 class="mt-4">Experience the ease of electronic document certification with Certify.</h5>
+            <div id="thesisCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <h5>Anti-bureaucracy. Upload a document and create its page in seconds. On the other hand, just three clicks and your document is signed. Maximum speed — minimum effort!</h5>
+                    </div>
+                    <div class="carousel-item">
+                        <h5>Convenience. An intuitive interface with easy navigation. The whole set of basic important functions for working with signing documents and nothing else that could distract you!</h5>
+                    </div>
+                    <div class="carousel-item">
+                        <h5>Equal opportunities for all our users. Whether your document is a geopolitical resolution or just a contract between two friends — in both cases you get the full set of our site functionality!</h5>
+                    </div>
+                    <div class="carousel-item">
+                        <h5>Our service is absolutely free of charge. It provides all the features for free, without any annoying ads or paid options. Our focus is solely on documents!</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-10">
+            <div class=" d-flex justify-content-center">
+                @{
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <a asp-action="Index" asp-controller="MyDocuments" class="btn btn-success col-5 mt-5">
+                            Get to work!
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-success col-5 mt-5">
+                            Try Certify now!
+                        </a>
+                    }
+
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 d-flex justify-content-end">
+        <img src="~/index_image.png" alt="" width="105%" height="105%" />
+    </div>
 </div>
-
-
 <div class="container">
-   
-</div>
-<div class="container">
-
-</div>
-<div class="container">
-
-</div>
-<div class="container">
-
 </div>

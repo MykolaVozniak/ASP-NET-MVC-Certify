@@ -2,7 +2,7 @@
 
 namespace Certify.Library.ViewModels
 {
-    public class ForMyDocumentsInfo
+    public class MyDocumentsInfoVM
     {
         public int Id { get; set; }
         public string Title { get; set; }

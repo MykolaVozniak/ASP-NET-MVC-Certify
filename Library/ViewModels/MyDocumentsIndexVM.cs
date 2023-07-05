@@ -1,6 +1,6 @@
 ﻿namespace Certify.Library.ViewModels
 {
-    public class ForMyDocumentsIndex
+    public class MyDocumentsIndexVM
     {
         public int Id { get; set; }
         public string Title { get; set; }

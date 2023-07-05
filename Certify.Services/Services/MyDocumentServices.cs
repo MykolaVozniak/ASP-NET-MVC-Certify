@@ -33,11 +33,11 @@ namespace Certify.Services.Services
 
 
         //----------------------------------------------Index----------------------------------------------
-        public async Task<List<ForMyDocumentsIndex>> GetDocumentForIndexAsync()
+        public async Task<List<MyDocumentsIndexVM>> GetDocumentForIndexAsync()
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             var documents = _context.Documents.Where(d => d.UserId == user.Id).ToList();
-            List<ForMyDocumentsIndex> documentList = _mapper.Map<List<Document>, List<ForMyDocumentsIndex>>(documents);
+            List<MyDocumentsIndexVM> documentList = _mapper.Map<List<Document>, List<MyDocumentsIndexVM>>(documents);
 
             foreach (var document in documentList)
             {
@@ -68,17 +68,17 @@ namespace Certify.Services.Services
 
 
         //----------------------------------------------Info----------------------------------------------
-         public async Task<ForMyDocumentsInfo> InfoAsync(int id)
+         public async Task<MyDocumentsInfoVM> InfoAsync(int id)
          {
              Document doc = await _context.Documents.Include(d => d.User).FirstAsync(d => d.Id == id);
-             ForMyDocumentsInfo document = _mapper.Map<Data.Entity.Document, ForMyDocumentsInfo>(doc);
+             MyDocumentsInfoVM document = _mapper.Map<Data.Entity.Document, MyDocumentsInfoVM>(doc);
              SelectUserSigned(document, id);
              document.IsUserSignatuer = await IsUserSignaturer(document.Id);
              document.IsUserOwner = await IsUserOwner(document.Id);
 
              return document;
          }
-        private async Task SelectUserSigned(ForMyDocumentsInfo document, int id)
+        private async Task SelectUserSigned(MyDocumentsInfoVM document, int id)
         {
             var signedUsers = _context.Signatures
                 .Include(s => s.User)
@@ -135,7 +135,7 @@ namespace Certify.Services.Services
 
 
         //----------------------------------------------Create----------------------------------------------
-        public async Task AddFile(ForMyDocumentsCreate dasc)
+        public async Task AddFile(MyDocumentsCreateVM dasc)
         {
 
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
@@ -150,7 +150,7 @@ namespace Certify.Services.Services
                 await dasc.UploadedFile.CopyToAsync(fileStream);
             }
 
-            Document document = _mapper.Map<ForMyDocumentsCreate, Document>(dasc);
+            Document document = _mapper.Map<MyDocumentsCreateVM, Document>(dasc);
             document.UploadedDate = DateTime.Now;
             document.FileURL = filePath;
             document.UserId = user.Id;
@@ -162,7 +162,7 @@ namespace Certify.Services.Services
         }
 
 
-        private async Task CreateSignatureAsync(ForMyDocumentsCreate dasc)
+        private async Task CreateSignatureAsync(MyDocumentsCreateVM dasc)
         {
             var lastDocument = _context.Documents.OrderByDescending(d => d.Id).First();
             var signatures = new List<Signature>();
@@ -270,14 +270,14 @@ namespace Certify.Services.Services
         }
 
         //----------------------------------------------Edit----------------------------------------------
-        public async Task<ForMyDocumentsEdit> EditAsync(int id)
+        public async Task<MyDocumentsEditVM> EditAsync(int id)
         {
-            ForMyDocumentsEdit document = _mapper.Map<Document, ForMyDocumentsEdit>(_context.Documents.Find(id));
+            MyDocumentsEditVM document = _mapper.Map<Document, MyDocumentsEditVM>(_context.Documents.Find(id));
 
             return document;
         }
 
-        public async Task Edit(int id, ForMyDocumentsEdit updatedDocument)
+        public async Task Edit(int id, MyDocumentsEditVM updatedDocument)
         {
             Document? document = _context.Documents.Find(id);
 

@@ -20,13 +20,13 @@ namespace Certify.Services.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<ForMySignaturesIndex>> GetSignedDocumentsByUserId()
+        public async Task<List<MySignaturesIndexVM>> GetSignedDocumentsByUserId()
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             string userId = user.Id;
             var documents = _context.Signatures
                 .Where(s => s.UserId == userId && s.IsSigned != null) //змінити на !=
-                .Select(s => new ForMySignaturesIndex
+                .Select(s => new MySignaturesIndexVM
                 {
                     Id = s.DocumentId,
                     SignedDate = s.SignedDate,

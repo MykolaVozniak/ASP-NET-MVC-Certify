@@ -1,6 +1,6 @@
 ﻿namespace Certify.Library.ViewModels
 {
-    public class ForMySignaturesIndex
+    public class MySignaturesIndexVM
     {
         public int Id { get; set; }
         public DateTime SignedDate { get; set; }

@@ -65,7 +65,7 @@ namespace Certify.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddFile(ForMyDocumentsCreate dasc)
+        public async Task<IActionResult> AddFile(MyDocumentsCreateVM dasc)
         {
 
             if (!ModelState.IsValid)

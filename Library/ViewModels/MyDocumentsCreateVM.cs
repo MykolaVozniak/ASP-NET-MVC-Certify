@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Certify.Library.ViewModels
 {
-    public class ForMyDocumentsCreate
+    public class MyDocumentsCreateVM
     {
         [Required(ErrorMessage = ("Attach the file"))]
         public IFormFile UploadedFile { get; set; }
