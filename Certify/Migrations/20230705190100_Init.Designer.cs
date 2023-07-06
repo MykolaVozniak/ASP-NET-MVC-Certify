@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Data.Migrations
+namespace Certify.Migrations
 {
     [DbContext(typeof(CertifyDbContext))]
-    [Migration("20230703135643_Init")]
+    [Migration("20230705190100_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
