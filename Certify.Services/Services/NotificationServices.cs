@@ -21,7 +21,7 @@ namespace Certify.Services.Services
 
         public async Task<bool> IsNotification()
         {
-            var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            User? currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             bool? isNotification = _context.Signatures.Any(s => s.UserId == currentUser.Id && s.IsSigned == null);
             return isNotification ?? false;
         }

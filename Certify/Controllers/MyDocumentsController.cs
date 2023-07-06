@@ -124,7 +124,7 @@ namespace Certify.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> EditAsync(int id, ForMyDocumentsEdit updatedDocument)
+        public async Task<IActionResult> EditAsync(int id, MyDocumentsEditVM updatedDocument)
         {
             if (!ModelState.IsValid)
                 return View("Edit", updatedDocument);
